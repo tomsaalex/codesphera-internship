@@ -25,7 +25,29 @@ Output: [0, 1] because nums[0] + nums[1] == 9
 // It returns the indices as a slice of two integers.
 // Assumes exactly one solution exists.
 func TwoSum(nums []int, target int) []int {
-	return []int{0, 1}
+	numberMap := make(map[int][]int)
+
+	for idx, num := range nums {
+		positions, exists := numberMap[num]
+		if !exists {
+			numberMap[num] = []int{idx}
+			continue
+		}
+		positions = append(positions, idx)
+		numberMap[num] = positions
+	}
+
+	for idx, num := range nums {
+		diff := target - num
+
+		diffList := numberMap[diff]
+		for _, diffIdx := range diffList {
+			if diffIdx != idx {
+				return []int{idx, diffIdx}
+			}
+		}
+	}
+	return []int{}
 }
 
 func main() {
