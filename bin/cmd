@@ -33,7 +33,7 @@ cmd_dir="$(git rev-parse --show-toplevel)/cmd"
     cmd_dir="$(realpath ..)/cmd"
 }
 
-packages=($(find "$cmd_dir" -depth 1 -type d | xargs -I{} basename {}))
+packages=($(ls "$cmd_dir"))
 
 [ $# -eq 1 ] && {
     >&2 echo "Available packages to $command:"
