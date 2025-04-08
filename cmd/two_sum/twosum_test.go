@@ -2,6 +2,7 @@ package main
 
 import (
 	"reflect"
+	"slices"
 	"testing"
 )
 
@@ -38,7 +39,7 @@ func TestTwoSum(t *testing.T) {
 		},
 		{
 			name:     "Target is sum of first and last",
-			nums:     []int{1, 2, 3, 4, 5, 6},
+			nums:     []int{1, 2, 4, 4, 5, 6},
 			target:   7,
 			expected: []int{0, 5},
 		},
@@ -64,11 +65,13 @@ func TestTwoSum(t *testing.T) {
 				t.Errorf("nums[%d] + nums[%d] = %d, want %d", i, j, tt.nums[i]+tt.nums[j], tt.target)
 			}
 
-			// Optional strict order check:
-			if !reflect.DeepEqual(result, tt.expected) && !reflect.DeepEqual([]int{result[1], result[0]}, tt.expected) {
-				t.Logf("Returned indices: %v (order may vary)", result)
+			// sort in order to compare expected indices not their order
+			slices.Sort(tt.expected)
+			slices.Sort(result)
+
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("Returned indices %v do not match expected indices %v\n", result, tt.expected)
 			}
 		})
 	}
 }
-
