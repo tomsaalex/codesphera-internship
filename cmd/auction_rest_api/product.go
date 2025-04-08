@@ -3,10 +3,10 @@ package main
 import "encoding/json"
 
 type Product struct {
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Price       float64 `json:"price"`
-	IsSold      bool    `json:"isSold"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Price       *float64 `json:"price"`
+	IsSold      bool     `json:"isSold"`
 }
 
 func (p *Product) UnmarshalJSON(data []byte) error {
@@ -25,4 +25,9 @@ func (p *Product) UnmarshalJSON(data []byte) error {
 	aux.IsSold = false
 
 	return nil
+}
+
+type SimpleProductDTO struct {
+	Name  string   `json:"name"`
+	Price *float64 `json:"price"`
 }
