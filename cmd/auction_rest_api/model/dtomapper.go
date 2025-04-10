@@ -1,9 +1,9 @@
-package main
+package model
 
 type DTOMapper struct {
 }
 
-func (DTOMapper) productToSimpleProductDTO(p Product) SimpleProductDTO {
+func (DTOMapper) ProductToSimpleProductDTO(p Product) SimpleProductDTO {
 	sp := SimpleProductDTO{}
 
 	sp.Name = p.Name
