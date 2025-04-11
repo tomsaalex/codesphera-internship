@@ -7,45 +7,104 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const addUser = `-- name: AddUser :exec
+const addUser = `-- name: AddUser :one
 insert into users
-(username, password)
+(email, fullname, pass_hash, pass_salt)
 values
-($1, $2)
+($1, $2, $3, $4)
+RETURNING id, email, fullname, pass_hash, pass_salt
 `
 
 type AddUserParams struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Email    string `json:"email"`
+	Fullname string `json:"fullname"`
+	PassHash []byte `json:"pass_hash"`
+	PassSalt []byte `json:"pass_salt"`
 }
 
-func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) error {
-	_, err := q.db.Exec(ctx, addUser, arg.Username, arg.Password)
+func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, addUser,
+		arg.Email,
+		arg.Fullname,
+		arg.PassHash,
+		arg.PassSalt,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Fullname,
+		&i.PassHash,
+		&i.PassSalt,
+	)
+	return i, err
+}
+
+const deleteUser = `-- name: DeleteUser :exec
+DELETE FROM users
+WHERE id = $1
+`
+
+func (q *Queries) DeleteUser(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, deleteUser, id)
 	return err
 }
 
-const selectUsers = `-- name: SelectUsers :many
-select id, username, password from users
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id, email, fullname, pass_hash, pass_salt FROM users
+WHERE email = $1 LIMIT 1
 `
 
-func (q *Queries) SelectUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.db.Query(ctx, selectUsers)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []User{}
-	for rows.Next() {
-		var i User
-		if err := rows.Scan(&i.ID, &i.Username, &i.Password); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Fullname,
+		&i.PassHash,
+		&i.PassSalt,
+	)
+	return i, err
+}
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users
+set email = $2,
+fullname = $3,
+pass_hash = $4,
+pass_salt = $5
+WHERE id = $1
+RETURNING id, email, fullname, pass_hash, pass_salt
+`
+
+type UpdateUserParams struct {
+	ID       pgtype.UUID `json:"id"`
+	Email    string      `json:"email"`
+	Fullname string      `json:"fullname"`
+	PassHash []byte      `json:"pass_hash"`
+	PassSalt []byte      `json:"pass_salt"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUser,
+		arg.ID,
+		arg.Email,
+		arg.Fullname,
+		arg.PassHash,
+		arg.PassSalt,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Fullname,
+		&i.PassHash,
+		&i.PassSalt,
+	)
+	return i, err
 }

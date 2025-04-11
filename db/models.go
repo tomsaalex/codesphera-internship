@@ -17,6 +17,8 @@ type Product struct {
 
 type User struct {
 	ID       pgtype.UUID `json:"id"`
-	Username string      `json:"username"`
-	Password string      `json:"password"`
+	Email    string      `json:"email"`
+	Fullname string      `json:"fullname"`
+	PassHash []byte      `json:"pass_hash"`
+	PassSalt []byte      `json:"pass_salt"`
 }
