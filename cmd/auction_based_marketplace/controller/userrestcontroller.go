@@ -4,6 +4,7 @@ import (
 	"curs1_boilerplate/cmd/auction_based_marketplace/infrastructure"
 	"curs1_boilerplate/cmd/auction_based_marketplace/service"
 	"curs1_boilerplate/cmd/auction_based_marketplace/sharederrors"
+	"curs1_boilerplate/cmd/auction_based_marketplace/util"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -13,10 +14,14 @@ import (
 
 type UserRestController struct {
 	userService service.UserService
+	jwtHelper   util.JwtUtil
 }
 
-func NewUserRestController(userService service.UserService) *UserRestController {
-	return &UserRestController{userService: userService}
+func NewUserRestController(userService service.UserService, jwtHelper util.JwtUtil) *UserRestController {
+	return &UserRestController{
+		userService: userService,
+		jwtHelper:   jwtHelper,
+	}
 }
 
 func (rc *UserRestController) SetupRoutes(r chi.Router) {
@@ -25,7 +30,6 @@ func (rc *UserRestController) SetupRoutes(r chi.Router) {
 		r.Post("/login", rc.loginUser)
 	})
 	r.Route("/user", func(r chi.Router) {
-		r.Get("/", rc.getUser)
 		r.Delete("/", rc.deleteUser)
 		r.Put("/", rc.editUser)
 	})
@@ -41,7 +45,7 @@ func (rc *UserRestController) registerUser(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = rc.userService.Register(r.Context(), userDTO)
+	_, err = rc.userService.Register(r.Context(), userDTO)
 	if err != nil {
 		var authErr *service.AuthError
 		var duplicateEntityErr *sharederrors.DuplicateEntityError
@@ -77,7 +81,7 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// TODO: This also kinda needs to do some jwt wizardry/cookie wizardry, but not quite yet
-	err = rc.userService.Login(r.Context(), userDTO)
+	loggedUser, err := rc.userService.Login(r.Context(), userDTO)
 
 	if err != nil {
 		var authErr *service.AuthError
@@ -100,7 +104,16 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	token, err := rc.jwtHelper.GenerateJWT(loggedUser.Email)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Failed to log user in."))
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(token))
 }
 
 func (rc *UserRestController) deleteUser(w http.ResponseWriter, r *http.Request) {
@@ -153,28 +166,5 @@ func (rc *UserRestController) editUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(jsonProd)*/
-}
-
-func (rc *UserRestController) getUser(w http.ResponseWriter, r *http.Request) {
-	/*name := chi.URLParam(r, "name")
-
-	foundProduct, err := rc.productRepo.GetOne(r.Context(), name)
-	if err != nil {
-		// TODO: Don't assume that's the error. Make a specific error.
-		w.WriteHeader(http.StatusNotFound)
-		w.Write(fmt.Appendf(nil, "There is no product with the name \"%s\".", name))
-		return
-	}
-
-	jsonProd, err := json.Marshal(foundProduct)
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Server couldn't display the requested product, though it does exist. This should never happen.."))
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
 	w.Write(jsonProd)*/
 }

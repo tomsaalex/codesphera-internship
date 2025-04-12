@@ -24,7 +24,8 @@ func main() {
 	argonHelper := util.StandardArgon2idHash()
 	userService := service.NewUserService(userRepository, *serviceDTOMapper, *argonHelper)
 
-	userRestController := controller.NewUserRestController(*userService)
+	jwtHelper := util.NewJwtUtil()
+	userRestController := controller.NewUserRestController(*userService, *jwtHelper)
 
 	r := chi.NewRouter()
 	userRestController.SetupRoutes(r)
