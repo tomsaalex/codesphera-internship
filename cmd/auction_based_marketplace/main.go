@@ -6,6 +6,7 @@ import (
 	"curs1_boilerplate/cmd/auction_based_marketplace/service"
 	"curs1_boilerplate/cmd/auction_based_marketplace/util"
 	"curs1_boilerplate/db"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -20,7 +21,7 @@ func main() {
 	userRepository := infrastructure.NewDBUserRepository(queries)
 
 	serviceDTOMapper := service.NewServiceDTOMapper()
-	argonHelper := util.NewArgon2idHash(1, 32, 64*1024, 32, 256)
+	argonHelper := util.StandardArgon2idHash()
 	userService := service.NewUserService(userRepository, *serviceDTOMapper, *argonHelper)
 
 	userRestController := controller.NewUserRestController(*userService)
@@ -28,5 +29,6 @@ func main() {
 	r := chi.NewRouter()
 	userRestController.SetupRoutes(r)
 
+	fmt.Println("Server is listening on localhost:3000")
 	log.Fatal(http.ListenAndServe("localhost:3000", r))
 }

@@ -1,8 +1,11 @@
 package controller
 
 import (
+	"curs1_boilerplate/cmd/auction_based_marketplace/infrastructure"
 	"curs1_boilerplate/cmd/auction_based_marketplace/service"
+	"curs1_boilerplate/cmd/auction_based_marketplace/sharederrors"
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -38,32 +41,25 @@ func (rc *UserRestController) registerUser(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	reqerrs := ""
-
-	if userDTO.Fullname == "" {
-		reqerrs += "Cannot register a user with no name.\n"
-	}
-
-	if userDTO.Email == "" {
-		reqerrs += "Cannot register a user with no email.\n"
-	}
-
-	if userDTO.Password == "" {
-		reqerrs += "Cannot register a user with no password.\n"
-	}
-
-	if reqerrs != "" {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(reqerrs))
-		return
-	}
-
 	err = rc.userService.Register(r.Context(), userDTO)
 	if err != nil {
-		// TODO: Don't just assume this means the name is taken. Make error for that specifically.
-		// TODO: Also, this could mean email taken too.
-		w.WriteHeader(http.StatusConflict)
-		w.Write([]byte(err.Error()))
+		var authErr *service.AuthError
+		var duplicateEntityErr *sharederrors.DuplicateEntityError
+		var valErr *service.ValidationError
+
+		if errors.As(err, &authErr) {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("The provided password does not respect requirements and cannot be used."))
+		} else if errors.As(err, &duplicateEntityErr) {
+			w.WriteHeader(http.StatusConflict)
+			w.Write([]byte("There's already a user with the given email address. Please choose another one."))
+		} else if errors.As(err, &valErr) {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("The provided user data is invalid and cannot be used"))
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("An unexpected error occurred on our end. Please retry later!"))
+		}
 		return
 	}
 
@@ -80,30 +76,27 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	reqerrs := ""
-
-	if userDTO.Email == "" {
-		reqerrs += "Users can't have a blank email.\n"
-	}
-
-	if userDTO.Password == "" {
-		reqerrs += "Users can't have a blank password.\n"
-	}
-
-	if reqerrs != "" {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(reqerrs))
-		return
-	}
-
 	// TODO: This also kinda needs to do some jwt wizardry/cookie wizardry, but not quite yet
 	err = rc.userService.Login(r.Context(), userDTO)
 
 	if err != nil {
-		// TODO: Don't just assume this means the name is taken. Make error for that specifically.
-		// TODO: Also, this could mean email taken too.
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
+		var authErr *service.AuthError
+		var entityNotFoundErr *infrastructure.EntityNotFoundError
+		var valErr *service.ValidationError
+
+		if errors.As(err, &authErr) {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("Authentication data invalid for the given email address."))
+		} else if errors.As(err, &entityNotFoundErr) {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("No user found with the given email address."))
+		} else if errors.As(err, &valErr) {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("The provided user data is invalid and cannot be used"))
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("An unexpected error occurred on our end. Please retry later!"))
+		}
 		return
 	}
 

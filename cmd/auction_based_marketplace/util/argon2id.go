@@ -42,6 +42,10 @@ func NewArgon2idHash(time, saltLen uint32, memory uint32, threads uint8, keyLen 
 	}
 }
 
+func StandardArgon2idHash() *Argon2idHash {
+	return NewArgon2idHash(1, 32, 64*1024, 32, 256)
+}
+
 func randomSecret(length uint32) ([]byte, error) {
 	secret := make([]byte, length)
 	_, err := rand.Read(secret)
