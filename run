@@ -16,6 +16,6 @@ function handle_sigint() {
 # Set the trap for SIGINT
 trap handle_sigint SIGINT
 
-wgo -file '\.templ$' templ generate &  
-wgo -file '\.sql$' sqlc generate & 
+wgo -file '\.templ$' templ generate &
+wgo -file '\.sql$' sqlc generate &
 wgo -file .go go run .

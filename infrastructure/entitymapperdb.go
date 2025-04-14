@@ -1,8 +1,8 @@
 package infrastructure
 
 import (
-	"curs1_boilerplate/cmd/auction_based_marketplace/model"
 	"curs1_boilerplate/db"
+	"curs1_boilerplate/model"
 )
 
 type EntityMapperDB struct {

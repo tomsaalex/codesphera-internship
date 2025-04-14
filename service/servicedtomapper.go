@@ -1,8 +1,8 @@
 package service
 
 import (
-	"curs1_boilerplate/cmd/auction_based_marketplace/model"
-	"curs1_boilerplate/cmd/auction_based_marketplace/util"
+	"curs1_boilerplate/model"
+	"curs1_boilerplate/util"
 )
 
 type ServiceDTOMapper struct {

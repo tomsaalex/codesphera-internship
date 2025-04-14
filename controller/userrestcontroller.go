@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"curs1_boilerplate/cmd/auction_based_marketplace/infrastructure"
-	"curs1_boilerplate/cmd/auction_based_marketplace/service"
-	"curs1_boilerplate/cmd/auction_based_marketplace/sharederrors"
-	"curs1_boilerplate/cmd/auction_based_marketplace/util"
+	"curs1_boilerplate/infrastructure"
+	"curs1_boilerplate/service"
+	"curs1_boilerplate/sharederrors"
+	"curs1_boilerplate/util"
 	"encoding/json"
 	"errors"
 	"net/http"

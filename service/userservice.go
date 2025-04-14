@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"curs1_boilerplate/cmd/auction_based_marketplace/infrastructure"
-	"curs1_boilerplate/cmd/auction_based_marketplace/model"
-	"curs1_boilerplate/cmd/auction_based_marketplace/sharederrors"
-	"curs1_boilerplate/cmd/auction_based_marketplace/util"
+	"curs1_boilerplate/infrastructure"
+	"curs1_boilerplate/model"
+	"curs1_boilerplate/sharederrors"
+	"curs1_boilerplate/util"
 )
 
 type UserService struct {
