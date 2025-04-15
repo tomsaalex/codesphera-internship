@@ -2,6 +2,7 @@ package controller
 
 import (
 	"curs1_boilerplate/views/base"
+	"curs1_boilerplate/views/components/navbar"
 	"curs1_boilerplate/views/pages"
 	"net/http"
 
@@ -20,5 +21,5 @@ func (rc *AuthRestController) SetupRoutes(r chi.Router) {
 }
 
 func (rc *AuthRestController) loginPage(w http.ResponseWriter, r *http.Request) {
-	base.PageSkeleton(pages.LoginPage()).Render(r.Context(), w)
+	base.PageSkeleton(pages.LoginPage(navbar.MakeStandardNavbar())).Render(r.Context(), w)
 }

@@ -1,0 +1,5 @@
+package button
+
+templ component(m *Model) {
+    <button id={m.id} hx-get={m.getAddr} hx-target={m.getTarget} class="btn btn-outline-secondary">{m.content}</button>
+}

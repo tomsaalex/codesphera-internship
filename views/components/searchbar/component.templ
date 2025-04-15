@@ -1,0 +1,9 @@
+package searchbar
+
+templ component(m *Model) {
+    <form id={m.id} role="search" class="w-50 input-group flex-nowrap">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control" placeholder={m.placeholder} aria-label={m.label} aria-describedby="addon-wrapping">
+        <button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
+    </form>
+}

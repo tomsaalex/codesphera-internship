@@ -1,9 +1,9 @@
 package pages
 
+templ homeContent() {
+
+}
+
 templ HomePage(nav templ.Component) {
-    <header>
-        @nav
-    </header>
-    
-    <main></main>
+    @common(nav, homeContent())
 }

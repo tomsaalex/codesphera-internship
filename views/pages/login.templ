@@ -1,8 +1,36 @@
 package pages
 
-templ LoginPage() {
-    <div>
-        <h1>Login!</h1>
-        <p>This is gonna look so good in a future release!!</p>
+// TODO: This whole thing is ugly as all sin, and probably has a lot of redundancies
+templ loginContent() {
+    <div class="d-flex flex-column flex-grow-1 h-full justify-content-center"> 
+        <div class="rounded-corners align-self-center w-25 bg-body-secondary rounded">
+            <div class="d-flex flex-column">
+                <h1 class="m-auto">Login</h1>
+                <form class="d-flex flex-column">
+                    <div class="mb-3">
+                        <label for="inputName" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="inputName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputEmail" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp">
+                        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="inputPassword">
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputConfirmPassword" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="inputConfirmPassword">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Submit</button>
+                </form>
+            </div>
+        </div>
     </div>
+}
+
+templ LoginPage(nav templ.Component) {
+    @common(nav, loginContent())
 }

@@ -1,0 +1,9 @@
+package buttongroup
+
+templ component(m *Model) {
+    <div id={m.id} class="btn-group" role="group" aria-label={m.label}>
+        for _, button := range m.buttons {
+            @button
+        }    
+    </div>
+}

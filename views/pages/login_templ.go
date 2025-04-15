@@ -8,7 +8,8 @@ package pages
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func LoginPage() templ.Component {
+// TODO: This whole thing is ugly as all sin, and probably has a lot of redundancies
+func loginContent() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,7 +30,36 @@ func LoginPage() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div><h1>Login!</h1><p>This is gonna look so good in a future release!!</p></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"d-flex flex-column flex-grow-1 h-full justify-content-center\"><div class=\"rounded-corners align-self-center w-25 bg-body-secondary rounded\"><div class=\"d-flex flex-column\"><h1 class=\"m-auto\">Login</h1><form class=\"d-flex flex-column\"><div class=\"mb-3\"><label for=\"inputName\" class=\"form-label\">Full Name</label> <input type=\"text\" class=\"form-control\" id=\"inputName\"></div><div class=\"mb-3\"><label for=\"inputEmail\" class=\"form-label\">Email address</label> <input type=\"email\" class=\"form-control\" id=\"inputEmail\" aria-describedby=\"emailHelp\"><div id=\"emailHelp\" class=\"form-text\">We'll never share your email with anyone else.</div></div><div class=\"mb-3\"><label for=\"inputPassword\" class=\"form-label\">Password</label> <input type=\"password\" class=\"form-control\" id=\"inputPassword\"></div><div class=\"mb-3\"><label for=\"inputConfirmPassword\" class=\"form-label\">Confirm Password</label> <input type=\"password\" class=\"form-control\" id=\"inputConfirmPassword\"></div><button type=\"submit\" class=\"btn btn-primary w-full\">Submit</button></form></div></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func LoginPage(nav templ.Component) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var2 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var2 == nil {
+			templ_7745c5c3_Var2 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = common(nav, loginContent()).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

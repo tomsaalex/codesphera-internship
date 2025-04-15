@@ -1,0 +1,6 @@
+package anchor
+
+
+templ component(m *Model) {
+    <a  href={templ.URL(m.destination)} id={m.id} class="btn btn-outline-secondary">{m.content}</a>
+}
