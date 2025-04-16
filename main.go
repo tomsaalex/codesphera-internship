@@ -42,7 +42,7 @@ func main() {
 	fs := http.StripPrefix("/images/", http.FileServer(http.Dir("./static/images")))
 	r.Handle("/images/*", fs)
 
-	fmt.Println("Server is listening on localhost:8008")
-	log.Fatal(http.ListenAndServe("localhost:8008", r))
+	fmt.Println("Server is listening on :8008")
+	log.Fatal(http.ListenAndServe(":8008", r))
 
 }

@@ -9,8 +9,8 @@ templ component(m *Model) {
         </button>
         <div id={m.id+"navbarNavAltMarkup"} class="justify-content-between collapse navbar-collapse">
             <div class="navbar-nav">
-                for linkName, linkDest  :=range m.links {
-                    <a class="nav-link" href={templ.URL(linkDest)}>{linkName}</a>
+                for _, navLink := range m.links {
+                    <a class="nav-link" href={templ.URL(navLink.LinkDestination)}>{navLink.LinkText}</a>
                 }
             </div>
             

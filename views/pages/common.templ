@@ -1,15 +1,17 @@
 package pages
 
-templ common(nav, mainContent templ.Component) {
-    <div class="page-wrapper h-full d-flex flex-column">
-    <header>
-        @nav
-    </header>
-    
-    <main id="main-content" class="d-flex flex-column flex-grow-1">
-        @mainContent
-    </main>
+	import "curs1_boilerplate/views/components/footer"
 
-    <footer>Idk bro</footer>
+templ common(navbar, mainContent templ.Component) {
+    <div class="page-wrapper h-full d-flex flex-column">
+        <header>
+            @navbar
+        </header>
+        
+        <main id="main-content" class="d-flex flex-column flex-grow-1">
+            @mainContent
+        </main>
+
+        @footer.Component()
     </div>
 }

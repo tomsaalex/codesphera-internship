@@ -72,12 +72,12 @@ func component(m *Model) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for linkName, linkDest := range m.links {
+		for _, navLink := range m.links {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<a class=\"nav-link\" href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var5 templ.SafeURL = templ.URL(linkDest)
+			var templ_7745c5c3_Var5 templ.SafeURL = templ.URL(navLink.LinkDestination)
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var5)))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -87,9 +87,9 @@ func component(m *Model) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(linkName)
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(navLink.LinkText)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/navbar/navbar.templ`, Line: 13, Col: 76}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/navbar/navbar.templ`, Line: 13, Col: 99}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {

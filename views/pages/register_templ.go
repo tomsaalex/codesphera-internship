@@ -8,8 +8,7 @@ package pages
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-// TODO: This whole thing is ugly as all sin, and probably has a lot of redundancies
-func loginContent() templ.Component {
+func registerContent() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -30,7 +29,7 @@ func loginContent() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"d-flex flex-column flex-grow-1 h-full justify-content-center\"><div class=\"rounded-corners align-self-center w-25 bg-body-secondary rounded\"><div class=\"d-flex flex-column p-4\"><h1 class=\"m-auto\">Login</h1><form class=\"d-flex flex-column align-items-center\"><div class=\"mb-3 w-75\"><label for=\"inputEmail\" class=\"form-label\">Email address</label> <input type=\"email\" class=\"form-control\" id=\"inputEmail\" aria-describedby=\"emailHelp\"></div><div class=\"mb-3 w-75\"><label for=\"inputPassword\" class=\"form-label\">Password</label> <input type=\"password\" class=\"form-control\" id=\"inputPassword\"></div><button type=\"submit\" class=\"btn btn-primary w-75\">Login</button> <a href=\"/register\" class=\"btn btn-link\">Don't have an account? Register here!</a></form></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"d-flex flex-column flex-grow-1 h-full justify-content-center\"><div class=\"rounded-corners align-self-center w-25 bg-body-secondary rounded\"><div class=\"d-flex flex-column p-4\"><h1 class=\"m-auto\">Login</h1><form class=\"d-flex flex-column align-items-center\"><div class=\"mb-3 w-75\"><label for=\"inputName\" class=\"form-label\">Full Name</label> <input type=\"text\" class=\"form-control\" id=\"inputName\"></div><div class=\"mb-3 w-75\"><label for=\"inputEmail\" class=\"form-label\">Email address</label> <input type=\"email\" class=\"form-control\" id=\"inputEmail\" aria-describedby=\"emailHelp\"><div id=\"emailHelp\" class=\"form-text\">We'll never share your email with anyone else.</div></div><div class=\"mb-3 w-75\"><label for=\"inputPassword\" class=\"form-label\">Password</label> <input type=\"password\" class=\"form-control\" id=\"inputPassword\"></div><div class=\"mb-3 w-75\"><label for=\"inputConfirmPassword\" class=\"form-label\">Confirm Password</label> <input type=\"password\" class=\"form-control\" id=\"inputConfirmPassword\"></div><button type=\"submit\" class=\"btn btn-primary w-75\">Register</button> <a href=\"/login\" class=\"btn btn-link\">Already have an account? Login here!</a></form></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -38,7 +37,7 @@ func loginContent() templ.Component {
 	})
 }
 
-func LoginPage(nav templ.Component) templ.Component {
+func RegisterPage(nav templ.Component) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -59,7 +58,7 @@ func LoginPage(nav templ.Component) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = common(nav, loginContent()).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = common(nav, registerContent()).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

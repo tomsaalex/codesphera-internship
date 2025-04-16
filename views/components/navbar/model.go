@@ -10,14 +10,19 @@ import (
 	"github.com/a-h/templ"
 )
 
+type NavLink struct {
+	LinkText        string
+	LinkDestination string
+}
+
 type Model struct {
 	id         string
-	links      map[string]string
+	links      []NavLink
 	searchbar  templ.Component
 	authButton templ.Component
 }
 
-func Make(id string, links map[string]string, searchbar, authButton templ.Component) *Model {
+func Make(id string, links []NavLink, searchbar, authButton templ.Component) *Model {
 	return &Model{
 		id:         id,
 		links:      links,
@@ -26,12 +31,18 @@ func Make(id string, links map[string]string, searchbar, authButton templ.Compon
 	}
 }
 
-func MakeStandardNavbar() templ.Component {
-	navLinks := make(map[string]string)
-	navLinks["Home"] = "/"
-	navLinks["About Us"] = "#"
-	navLinks["Start An Auction"] = "#"
+func MakeStandardNavLinks() []NavLink {
+	// TODO: Refactor this out of here... somewhere
 
+	navLinks := make([]NavLink, 0)
+	navLinks = append(navLinks, NavLink{LinkText: "Home", LinkDestination: "/"})
+	navLinks = append(navLinks, NavLink{LinkText: "About Us", LinkDestination: "#"})
+	navLinks = append(navLinks, NavLink{LinkText: "Start An Auction", LinkDestination: "#"})
+	return navLinks
+}
+
+func MakeStandardNavbar() templ.Component {
+	navLinks := MakeStandardNavLinks()
 	navSearch := searchbar.Make("nav-search", "Search for auctions", "Search auctions")
 
 	registerButton := anchor.Make("register-button", "Register!", "/register")
