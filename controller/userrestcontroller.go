@@ -45,7 +45,7 @@ func (rc *UserRestController) registerUser(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	_, err = rc.userService.Register(r.Context(), userDTO)
+	registeredUser, err := rc.userService.Register(r.Context(), userDTO)
 	if err != nil {
 		var authErr *service.AuthError
 		var duplicateEntityErr *sharederrors.DuplicateEntityError
@@ -67,7 +67,25 @@ func (rc *UserRestController) registerUser(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	token, err := rc.jwtHelper.GenerateJWT(registeredUser.Email)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	cookie := http.Cookie{
+		Name:     "authCookie",
+		Value:    token,
+		Path:     "/",
+		MaxAge:   3600,
+		HttpOnly: true,
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	http.SetCookie(w, &cookie)
+	w.Header().Set("HX-Redirect", "/")
 }
 
 func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) {
@@ -108,12 +126,21 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Failed to log user in."))
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(token))
+	cookie := http.Cookie{
+		Name:     "authCookie",
+		Value:    token,
+		Path:     "/",
+		MaxAge:   3600,
+		HttpOnly: true,
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	http.SetCookie(w, &cookie)
+	w.Header().Set("HX-Redirect", "/")
 }
 
 func (rc *UserRestController) deleteUser(w http.ResponseWriter, r *http.Request) {

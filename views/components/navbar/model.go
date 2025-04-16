@@ -37,7 +37,7 @@ func MakeStandardNavLinks() []NavLink {
 	navLinks := make([]NavLink, 0)
 	navLinks = append(navLinks, NavLink{LinkText: "Home", LinkDestination: "/"})
 	navLinks = append(navLinks, NavLink{LinkText: "About Us", LinkDestination: "#"})
-	navLinks = append(navLinks, NavLink{LinkText: "Start An Auction", LinkDestination: "#"})
+	navLinks = append(navLinks, NavLink{LinkText: "Start An Auction", LinkDestination: "/secret"})
 	return navLinks
 }
 
