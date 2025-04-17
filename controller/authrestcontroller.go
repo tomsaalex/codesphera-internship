@@ -4,6 +4,7 @@ import (
 	"curs1_boilerplate/views/base"
 	"curs1_boilerplate/views/components/navbar"
 	"curs1_boilerplate/views/pages"
+	loginpage "curs1_boilerplate/views/pages/login"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -22,7 +23,9 @@ func (rc *AuthRestController) SetupRoutes(r chi.Router) {
 }
 
 func (rc *AuthRestController) loginPage(w http.ResponseWriter, r *http.Request) {
-	base.PageSkeleton(pages.LoginPage(navbar.MakeStandardNavbar())).Render(r.Context(), w)
+	loginPage := loginpage.MakeValidLoginPage(navbar.MakeStandardNavbar())
+
+	base.PageSkeleton(loginPage).Render(r.Context(), w)
 }
 
 func (rc *AuthRestController) registerPage(w http.ResponseWriter, r *http.Request) {

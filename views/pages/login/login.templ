@@ -1,0 +1,38 @@
+package loginpage
+
+import "curs1_boilerplate/views/pages"
+
+templ loginContent(viewModel *ViewModel) {
+    <div class="d-flex flex-column flex-grow-1 h-full justify-content-center"> 
+        <div class="rounded-corners align-self-center w-25 bg-body-secondary rounded">
+            <div class="d-flex flex-column p-4">
+                <h1 class="m-auto">Login</h1>
+                <form id="loginForm" hx-post="/auth/login" hx-select="#loginForm" hx-ext="form-json" class="d-flex flex-column align-items-center" novalidate>
+                    <div class="mb-3 w-75">
+                        <label for="inputEmail" class="form-label">Email address</label>
+                        <input type="email" name="email" class={viewModel.emailCSSClasses} id="inputEmail" aria-describedby="emailHelp" required>
+                        if viewModel.emailHasError{
+                            <p class="text-danger">{viewModel.emailError}</p>
+                        }
+                    </div>
+                    <div class="mb-3 w-75">
+                        <label for="inputPassword" class="form-label">Password</label>
+                        <input type="password" name="password" class={viewModel.passwordCSSClasses} id="inputPassword" required>
+                        if viewModel.passwordHasError{
+                            <p class="text-danger">{viewModel.passwordError}</p>
+                        }
+                    </div>
+                    if viewModel.isGenericError {
+                        <p class="text-danger">{viewModel.genericError}</p>
+                    }
+                    <button type="submit" class="btn btn-primary w-75">Login</button>
+                    <a href="/register" class="btn btn-link">Don't have an account? Register here!</a>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+templ LoginPage(viewModel *ViewModel, nav templ.Component) {
+    @pages.Common(nav, loginContent(viewModel))
+}

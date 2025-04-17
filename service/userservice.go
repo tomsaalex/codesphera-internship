@@ -23,43 +23,50 @@ func NewUserService(userRepo infrastructure.UserRepository, dtoMapper ServiceDTO
 }
 
 func (s *UserService) validateUserRegistrationDTO(userDTO UserRegistrationDTO) error {
-	reqerrs := ""
+	ve := NewValidationError()
+	validationSuccessful := true
 
 	if userDTO.Fullname == "" {
-		reqerrs += "Cannot register a user with no name.\n"
+		ve.fieldErrors["fullname"] = EMPTY
+		validationSuccessful = false
 	}
 
 	if userDTO.Email == "" {
-		reqerrs += "Cannot register a user with no email.\n"
+		ve.fieldErrors["email"] = EMPTY
+		validationSuccessful = false
 	}
 
 	if userDTO.Password == "" {
-		reqerrs += "Cannot register a user with no password.\n"
+		ve.fieldErrors["password"] = EMPTY
+		validationSuccessful = false
 	}
 
-	if reqerrs != "" {
-		return &ValidationError{Message: reqerrs}
+	if validationSuccessful {
+		return nil
 	}
 
-	return nil
+	return ve
 }
 
 func (s *UserService) validateUserLoginDTO(userDTO UserLoginDTO) error {
-	reqerrs := ""
+	ve := NewValidationError()
+	validationSuccessful := true
 
 	if userDTO.Email == "" {
-		reqerrs += "Users can't have a blank email.\n"
+		ve.fieldErrors["email"] = EMPTY
+		validationSuccessful = false
 	}
 
 	if userDTO.Password == "" {
-		reqerrs += "Users can't have a blank password.\n"
+		ve.fieldErrors["password"] = EMPTY
+		validationSuccessful = false
 	}
 
-	if reqerrs != "" {
-		return &ValidationError{Message: reqerrs}
+	if validationSuccessful {
+		return nil
 	}
 
-	return nil
+	return ve
 }
 
 func (s *UserService) Register(ctx context.Context, userDTO UserRegistrationDTO) (*model.User, error) {

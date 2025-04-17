@@ -5,6 +5,9 @@ import (
 	"curs1_boilerplate/service"
 	"curs1_boilerplate/sharederrors"
 	"curs1_boilerplate/util"
+	"curs1_boilerplate/views/base"
+	"curs1_boilerplate/views/components/navbar"
+	loginpage "curs1_boilerplate/views/pages/login"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -92,13 +95,16 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 	var userDTO service.UserLoginDTO
 	err := json.NewDecoder(r.Body).Decode(&userDTO)
 
+	formErrs := loginpage.LoginFormErrors{}
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Malformed request - request body couldn't be parsed."))
+		formErrs.GenericError = "Request failed for an unknown reason"
+
+		loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar())
+
+		base.PageSkeleton(loginPage).Render(r.Context(), w)
 		return
 	}
 
-	// TODO: This also kinda needs to do some jwt wizardry/cookie wizardry, but not quite yet
 	loggedUser, err := rc.userService.Login(r.Context(), userDTO)
 
 	if err != nil {
@@ -107,17 +113,43 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 		var valErr *service.ValidationError
 
 		if errors.As(err, &authErr) {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Authentication data invalid for the given email address."))
+			formErrs.GenericError = "Email or Password are incorrect"
+
+			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar())
+
+			base.PageSkeleton(loginPage).Render(r.Context(), w)
 		} else if errors.As(err, &entityNotFoundErr) {
-			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte("No user found with the given email address."))
+			formErrs.GenericError = "Email or Password are incorrect"
+
+			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar())
+
+			base.PageSkeleton(loginPage).Render(r.Context(), w)
 		} else if errors.As(err, &valErr) {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("The provided user data is invalid and cannot be used"))
+			emailErr, hasEmailErr := valErr.GetField("email")
+			passwordErr, hasPasswordErr := valErr.GetField("password")
+
+			if hasEmailErr {
+				switch emailErr {
+				case service.EMPTY:
+					formErrs.EmailError = "You can't log in with a blank email."
+				}
+			}
+			if hasPasswordErr {
+				switch passwordErr {
+				case service.EMPTY:
+					formErrs.PasswordError = "You can't log in with a blank password."
+				}
+			}
+
+			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar())
+
+			base.PageSkeleton(loginPage).Render(r.Context(), w)
 		} else {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("An unexpected error occurred on our end. Please retry later!"))
+
+			formErrs.GenericError = "An unexpected error occurred on our end. Please retry later!"
+			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar())
+
+			base.PageSkeleton(loginPage).Render(r.Context(), w)
 		}
 		return
 	}
@@ -125,7 +157,9 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 	token, err := rc.jwtHelper.GenerateJWT(loggedUser.Email)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		formErrs.GenericError = "Request failed for an unknown reason"
+		loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar())
+		base.PageSkeleton(loginPage).Render(r.Context(), w)
 		return
 	}
 

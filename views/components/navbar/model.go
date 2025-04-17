@@ -41,7 +41,7 @@ func MakeStandardNavLinks() []NavLink {
 	return navLinks
 }
 
-func MakeStandardNavbar() templ.Component {
+func MakeStandardNavbar() *Model {
 	navLinks := MakeStandardNavLinks()
 	navSearch := searchbar.Make("nav-search", "Search for auctions", "Search auctions")
 

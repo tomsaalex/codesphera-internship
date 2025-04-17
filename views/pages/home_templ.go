@@ -54,7 +54,7 @@ func HomePage(nav templ.Component) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = common(nav, homeContent()).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Common(nav, homeContent()).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
