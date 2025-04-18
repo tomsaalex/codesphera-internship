@@ -1,0 +1,53 @@
+package registerpage
+
+import "curs1_boilerplate/views/pages"
+
+templ registerContent(viewModel *ViewModel) {
+    <div class="d-flex flex-column flex-grow-1 h-full justify-content-center"> 
+        <div class="rounded-corners align-self-center w-25 bg-body-secondary rounded">
+            <div class="d-flex flex-column p-4">
+                <h1 class="m-auto">Register</h1>
+                <form id="registerForm" hx-post="/auth/register" hx-select="#registerForm" hx-swap="outerHTML" hx-ext="form-json" class="d-flex flex-column align-items-center" novalidate>
+                    <div class="mb-3 w-75">
+                        <label for="inputName">Full Name</label>
+                        <input name="fullname" type="text" class={viewModel.fullnameCSSClasses} id="inputName">
+                        if viewModel.fullnameHasError {
+                            <p class="text-danger">{viewModel.fullnameError}</p>
+                        }
+                    </div>
+                    <div class="mb-3 w-75">
+                        <label for="inputEmail">Email address</label>
+                        <input name="email" type="email" class={viewModel.emailCSSClasses} id="inputEmail" aria-describedby="emailHelp">
+                        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                        if viewModel.emailHasError {
+                            <p class="text-danger">{viewModel.emailError}</p>
+                        }
+                    </div>
+                    <div class="mb-3 w-75">
+                        <label for="inputPassword">Password</label>
+                        <input name="password" type="password" class={viewModel.passwordCSSClasses} id="inputPassword">
+                        if viewModel.passwordHasError {
+                            <p class="text-danger">{viewModel.passwordError}</p>
+                        }
+                    </div>
+                    <div class="mb-3 w-75">
+                        <label for="inputConfirmPassword" >Confirm Password</label>
+                        <input name="confirmPassword" type="password" class={viewModel.confirmPasswordCSSClasses} id="inputConfirmPassword">
+                        if viewModel.confirmPasswordHasError {
+                            <p class="text-danger">{viewModel.confirmPasswordError}</p>
+                        }
+                    </div>
+                    if viewModel.isGenericError {
+                        <p class="text-danger">{viewModel.genericError}</p>
+                    }
+                    <button type="submit" class="btn btn-primary w-75">Register</button>
+                    <a href="/login" class="btn btn-link">Already have an account? Login here!</a>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+templ RegisterPage(viewModel *ViewModel, nav templ.Component) {
+    @pages.Common(nav, registerContent(viewModel))
+}

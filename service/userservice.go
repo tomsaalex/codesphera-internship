@@ -41,6 +41,16 @@ func (s *UserService) validateUserRegistrationDTO(userDTO UserRegistrationDTO) e
 		validationSuccessful = false
 	}
 
+	if userDTO.Password == "" {
+		ve.fieldErrors["confirmPassword"] = EMPTY
+		validationSuccessful = false
+	}
+
+	if userDTO.Password != userDTO.ConfirmPassword {
+		ve.fieldErrors["confirmPassword"] = INVALID
+		validationSuccessful = false
+	}
+
 	if validationSuccessful {
 		return nil
 	}

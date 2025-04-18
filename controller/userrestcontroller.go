@@ -8,6 +8,7 @@ import (
 	"curs1_boilerplate/views/base"
 	"curs1_boilerplate/views/components/navbar"
 	loginpage "curs1_boilerplate/views/pages/login"
+	registerpage "curs1_boilerplate/views/pages/register"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -42,9 +43,12 @@ func (rc *UserRestController) registerUser(w http.ResponseWriter, r *http.Reques
 	var userDTO service.UserRegistrationDTO
 	err := json.NewDecoder(r.Body).Decode(&userDTO)
 
+	formErrs := registerpage.RegisterFormErrors{}
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Malformed request - request body couldn't be parsed."))
+		formErrs.GenericError = "Request failed for an unknown reason"
+
+		registerPage := registerpage.MakeErroredRegisterPage(&formErrs, navbar.MakeStandardNavbar())
+		base.PageSkeleton(registerPage).Render(r.Context(), w)
 		return
 	}
 
@@ -55,25 +59,56 @@ func (rc *UserRestController) registerUser(w http.ResponseWriter, r *http.Reques
 		var valErr *service.ValidationError
 
 		if errors.As(err, &authErr) {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("The provided password does not respect requirements and cannot be used."))
+			formErrs.PasswordError = "Password could not be used. Please try again with another password."
 		} else if errors.As(err, &duplicateEntityErr) {
-			w.WriteHeader(http.StatusConflict)
-			w.Write([]byte("There's already a user with the given email address. Please choose another one."))
+			formErrs.EmailError = "Email is not available for registration. Please use another one."
 		} else if errors.As(err, &valErr) {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("The provided user data is invalid and cannot be used"))
+			fullnameError, hasFullnameErr := valErr.GetField("fullname")
+			emailErr, hasEmailErr := valErr.GetField("email")
+			passwordErr, hasPasswordErr := valErr.GetField("password")
+			confirmPassErr, hasConfirmPassErr := valErr.GetField("confirmPassword")
+
+			if hasFullnameErr {
+				switch fullnameError {
+				case service.EMPTY:
+					formErrs.FullnameError = "You can't register with a blank full name."
+				}
+			}
+			if hasEmailErr {
+				switch emailErr {
+				case service.EMPTY:
+					formErrs.EmailError = "You can't register with a blank email."
+				}
+			}
+			if hasPasswordErr {
+				switch passwordErr {
+				case service.EMPTY:
+					formErrs.PasswordError = "You can't register with a blank password."
+				}
+			}
+			if hasConfirmPassErr {
+				switch confirmPassErr {
+				case service.EMPTY:
+					formErrs.ConfirmPasswordError = "You can't register without confirming your password."
+				case service.INVALID:
+					formErrs.ConfirmPasswordError = "The 2 passwords you entered don't match."
+				}
+			}
+
 		} else {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("An unexpected error occurred on our end. Please retry later!"))
+			formErrs.GenericError = "An unexpected error occurred on our end. Please retry later!"
 		}
+
+		registerPage := registerpage.MakeErroredRegisterPage(&formErrs, navbar.MakeStandardNavbar())
+		base.PageSkeleton(registerPage).Render(r.Context(), w)
 		return
 	}
 
 	token, err := rc.jwtHelper.GenerateJWT(registeredUser.Email)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		registerPage := registerpage.MakeErroredRegisterPage(&formErrs, navbar.MakeStandardNavbar())
+		base.PageSkeleton(registerPage).Render(r.Context(), w)
 		return
 	}
 
@@ -178,54 +213,7 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 }
 
 func (rc *UserRestController) deleteUser(w http.ResponseWriter, r *http.Request) {
-	/*name := chi.URLParam(r, "name")
-
-	err := rc.productRepo.Delete(r.Context(), name)
-
-	if err != nil {
-		// TODO: Don't just assume this means no product was found with name. Make error specifically for this.
-		w.WriteHeader(http.StatusNotFound)
-		w.Write(fmt.Appendf(nil, "There is no product with the name \"%s\".", name))
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)*/
 }
 
 func (rc *UserRestController) editUser(w http.ResponseWriter, r *http.Request) {
-	/*name := chi.URLParam(r, "name")
-
-	foundProduct, err := rc.productRepo.GetOne(r.Context(), name)
-	if err != nil {
-		// TODO: Don't assume that's the error. Make a specific error.
-		w.WriteHeader(http.StatusNotFound)
-		w.Write(fmt.Appendf(nil, "There is no product with the name \"%s\".", name))
-		return
-	}
-
-	if foundProduct.IsSold {
-		w.WriteHeader(http.StatusConflict)
-		w.Write([]byte("The product has already been sold."))
-		return
-	}
-
-	foundProduct.IsSold = true
-	updatedProduct, err := rc.productRepo.Update(r.Context(), *foundProduct)
-
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		w.Write(fmt.Appendf(nil, "There is no product with the name \"%s\".", name))
-		return
-	}
-
-	jsonProd, err := json.Marshal(updatedProduct)
-
-	w.WriteHeader(http.StatusOK)
-
-	if err != nil {
-		w.Write([]byte("For some reason, the server couldn't display the sold item, but it HAS been sold. If you see this, congrats! It should never be possible."))
-		return
-	}
-
-	w.Write(jsonProd)*/
 }

@@ -3,8 +3,8 @@ package controller
 import (
 	"curs1_boilerplate/views/base"
 	"curs1_boilerplate/views/components/navbar"
-	"curs1_boilerplate/views/pages"
 	loginpage "curs1_boilerplate/views/pages/login"
+	registerpage "curs1_boilerplate/views/pages/register"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -29,5 +29,5 @@ func (rc *AuthRestController) loginPage(w http.ResponseWriter, r *http.Request) 
 }
 
 func (rc *AuthRestController) registerPage(w http.ResponseWriter, r *http.Request) {
-	base.PageSkeleton(pages.RegisterPage(navbar.MakeStandardNavbar())).Render(r.Context(), w)
+	base.PageSkeleton(registerpage.MakeValidRegisterPage(navbar.MakeStandardNavbar())).Render(r.Context(), w)
 }
