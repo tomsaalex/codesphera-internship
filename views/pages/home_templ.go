@@ -29,6 +29,10 @@ func homeContent() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"d-flex position-relative justify-content-center align-items-center\"><div class=\"position-absolute d-flex flex-column justify-content-center align-items-center\"><h1 class=\"text-white display-1 text-center figtree-bold\">Bidding without hassle<br>Sell and Purchase with ease</h1><div class=\"d-flex justify-content-between w-50\"><a href=\"#\" class=\"btn btn-primary btn-lg\">Browse Ongoing Auctions</a> <a href=\"#\" class=\"btn btn-success btn-lg\">Start An Auction</a></div></div><img src=\"images/home_page/bidrush_home_image.png\" class=\"w-100\"></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		return nil
 	})
 }

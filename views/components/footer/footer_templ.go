@@ -33,7 +33,7 @@ func Component() templ.Component {
 		ctx = templ.ClearChildren(ctx)
 
 		navLinks := navbar.MakeStandardNavLinks()
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<footer class=\"d-block py-3 my-4\"><ul class=\"nav justify-content-center border-bottom pb-3 mb-3\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<footer class=\"d-block py-3 mb-4\"><ul class=\"nav justify-content-center border-bottom pb-3 mb-3\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
