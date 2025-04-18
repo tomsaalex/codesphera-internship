@@ -4,6 +4,7 @@ import (
 	"curs1_boilerplate/controller"
 	"curs1_boilerplate/db"
 	"curs1_boilerplate/infrastructure"
+	"curs1_boilerplate/middleware"
 	"curs1_boilerplate/service"
 	"curs1_boilerplate/util"
 	"fmt"
@@ -14,7 +15,6 @@ import (
 )
 
 func main() {
-
 	// connect to the db
 	pool := db.NewConnectionPool()
 	queries := db.New(pool)
@@ -33,6 +33,8 @@ func main() {
 	authRestController := controller.NewAuthRestController()
 
 	r := chi.NewRouter()
+
+	r.Use(middleware.AttachUser(*jwtHelper))
 
 	userRestController.SetupRoutes(r)
 	generalRestController.SetupRoutes(r)

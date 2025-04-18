@@ -22,15 +22,16 @@ func NewGeneralRestController(jwtUtil util.JwtUtil) *GeneralRestController {
 func (rc *GeneralRestController) SetupRoutes(r chi.Router) {
 	r.Get("/", rc.homePage)
 
-	r.With(middleware.JwtAuth(rc.jwtUtil)).Get("/secret", rc.secretPage)
+	r.With(middleware.RequireAuth).Get("/secret", rc.secretPage)
 }
 
 func (rc *GeneralRestController) homePage(w http.ResponseWriter, r *http.Request) {
-	mainNavbar := navbar.MakeStandardNavbar()
+	mainNavbar := navbar.MakeStandardNavbar(r.Context())
 
 	base.PageSkeleton(pages.HomePage(mainNavbar)).Render(r.Context(), w)
 }
 
 func (rc *GeneralRestController) secretPage(w http.ResponseWriter, r *http.Request) {
-	base.PageSkeleton(pages.SecretPage(r.Context().Value("userEmail").(string))).Render(r.Context(), w)
+	userEmail := middleware.GetUserEmailFromContext(r.Context())
+	base.PageSkeleton(pages.SecretPage(userEmail)).Render(r.Context(), w)
 }

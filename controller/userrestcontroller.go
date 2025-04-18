@@ -47,7 +47,7 @@ func (rc *UserRestController) registerUser(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		formErrs.GenericError = "Request failed for an unknown reason"
 
-		registerPage := registerpage.MakeErroredRegisterPage(&formErrs, navbar.MakeStandardNavbar())
+		registerPage := registerpage.MakeErroredRegisterPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 		base.PageSkeleton(registerPage).Render(r.Context(), w)
 		return
 	}
@@ -99,7 +99,7 @@ func (rc *UserRestController) registerUser(w http.ResponseWriter, r *http.Reques
 			formErrs.GenericError = "An unexpected error occurred on our end. Please retry later!"
 		}
 
-		registerPage := registerpage.MakeErroredRegisterPage(&formErrs, navbar.MakeStandardNavbar())
+		registerPage := registerpage.MakeErroredRegisterPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 		base.PageSkeleton(registerPage).Render(r.Context(), w)
 		return
 	}
@@ -107,7 +107,7 @@ func (rc *UserRestController) registerUser(w http.ResponseWriter, r *http.Reques
 	token, err := rc.jwtHelper.GenerateJWT(registeredUser.Email)
 
 	if err != nil {
-		registerPage := registerpage.MakeErroredRegisterPage(&formErrs, navbar.MakeStandardNavbar())
+		registerPage := registerpage.MakeErroredRegisterPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 		base.PageSkeleton(registerPage).Render(r.Context(), w)
 		return
 	}
@@ -134,7 +134,7 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		formErrs.GenericError = "Request failed for an unknown reason"
 
-		loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar())
+		loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 
 		base.PageSkeleton(loginPage).Render(r.Context(), w)
 		return
@@ -150,13 +150,13 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 		if errors.As(err, &authErr) {
 			formErrs.GenericError = "Email or Password are incorrect"
 
-			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar())
+			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 
 			base.PageSkeleton(loginPage).Render(r.Context(), w)
 		} else if errors.As(err, &entityNotFoundErr) {
 			formErrs.GenericError = "Email or Password are incorrect"
 
-			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar())
+			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 
 			base.PageSkeleton(loginPage).Render(r.Context(), w)
 		} else if errors.As(err, &valErr) {
@@ -176,13 +176,13 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 				}
 			}
 
-			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar())
+			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 
 			base.PageSkeleton(loginPage).Render(r.Context(), w)
 		} else {
 
 			formErrs.GenericError = "An unexpected error occurred on our end. Please retry later!"
-			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar())
+			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 
 			base.PageSkeleton(loginPage).Render(r.Context(), w)
 		}
@@ -193,7 +193,7 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 
 	if err != nil {
 		formErrs.GenericError = "Request failed for an unknown reason"
-		loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar())
+		loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 		base.PageSkeleton(loginPage).Render(r.Context(), w)
 		return
 	}

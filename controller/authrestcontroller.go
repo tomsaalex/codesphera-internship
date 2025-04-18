@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"curs1_boilerplate/middleware"
 	"curs1_boilerplate/views/base"
 	"curs1_boilerplate/views/components/navbar"
 	loginpage "curs1_boilerplate/views/pages/login"
@@ -18,16 +19,16 @@ func NewAuthRestController() *AuthRestController {
 }
 
 func (rc *AuthRestController) SetupRoutes(r chi.Router) {
-	r.Get("/login", rc.loginPage)
-	r.Get("/register", rc.registerPage)
+	r.With(middleware.RequireGuest).Get("/login", rc.loginPage)
+	r.With(middleware.RequireGuest).Get("/register", rc.registerPage)
 }
 
 func (rc *AuthRestController) loginPage(w http.ResponseWriter, r *http.Request) {
-	loginPage := loginpage.MakeValidLoginPage(navbar.MakeStandardNavbar())
+	loginPage := loginpage.MakeValidLoginPage(navbar.MakeStandardNavbar(r.Context()))
 
 	base.PageSkeleton(loginPage).Render(r.Context(), w)
 }
 
 func (rc *AuthRestController) registerPage(w http.ResponseWriter, r *http.Request) {
-	base.PageSkeleton(registerpage.MakeValidRegisterPage(navbar.MakeStandardNavbar())).Render(r.Context(), w)
+	base.PageSkeleton(registerpage.MakeValidRegisterPage(navbar.MakeStandardNavbar(r.Context()))).Render(r.Context(), w)
 }

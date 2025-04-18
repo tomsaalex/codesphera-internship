@@ -3,34 +3,57 @@ package middleware
 import (
 	"context"
 	"curs1_boilerplate/util"
-	"fmt"
 	"net/http"
 )
 
-func JwtAuth(jwtHelper util.JwtUtil) func(next http.Handler) http.Handler {
+type jwtDataKey string
+
+const userEmailKey = jwtDataKey("userEmail")
+
+func AttachUser(jwtHelper util.JwtUtil) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authCookie, err := r.Cookie("authCookie")
-			if err != nil {
-				jwtAuthFailed(w, r)
-				fmt.Println("Failed big time")
-				return
+			newCtx := r.Context()
+			if err == nil {
+				userEmail, err := jwtHelper.ParseJWT(authCookie.Value)
+				if err == nil {
+					newCtx = SetUserEmailToContext(r.Context(), userEmail)
+				}
 			}
-
-			userEmail, err := jwtHelper.ParseJWT(authCookie.Value)
-			if err != nil {
-				jwtAuthFailed(w, r)
-				fmt.Println(err.Error())
-				return
-			}
-
-			// TODO: Use custom type for value
-			newCtx := context.WithValue(r.Context(), "userEmail", userEmail)
 			next.ServeHTTP(w, r.WithContext(newCtx))
 		})
 	}
 }
 
-func jwtAuthFailed(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+func RequireAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if GetUserEmailFromContext(r.Context()) == "" {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func RequireGuest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if GetUserEmailFromContext(r.Context()) != "" {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func SetUserEmailToContext(ctx context.Context, userEmail string) context.Context {
+	return context.WithValue(ctx, userEmailKey, userEmail)
+}
+
+func GetUserEmailFromContext(ctx context.Context) string {
+	userEmail, conversionValid := ctx.Value(userEmailKey).(string)
+	if conversionValid {
+		return userEmail
+	}
+	return ""
 }

@@ -2,8 +2,10 @@ package navbar
 
 import (
 	"context"
+	"curs1_boilerplate/middleware"
 	"curs1_boilerplate/views/components/anchor"
 	"curs1_boilerplate/views/components/buttongroup"
+	profilebutton "curs1_boilerplate/views/components/profile_button"
 	"curs1_boilerplate/views/components/searchbar"
 	"io"
 
@@ -41,15 +43,25 @@ func MakeStandardNavLinks() []NavLink {
 	return navLinks
 }
 
-func MakeStandardNavbar() *Model {
+// TODO: Replace context with profile info, maybe
+func MakeStandardNavbar(ctx context.Context) *Model {
 	navLinks := MakeStandardNavLinks()
 	navSearch := searchbar.Make("nav-search", "Search for auctions", "Search auctions")
 
-	registerButton := anchor.Make("register-button", "Register!", "/register")
-	loginButton := anchor.Make("login-button", "Log in!", "/login")
+	userEmail := middleware.GetUserEmailFromContext(ctx)
 
-	navAuthButton := buttongroup.Make("nav-auth", "Login/Register Buttons", []templ.Component{loginButton, registerButton})
-	return Make("main-nav", navLinks, navSearch, navAuthButton)
+	var navbarAuthComp templ.Component
+
+	if userEmail != "" {
+		navbarAuthComp = profilebutton.Make()
+	} else {
+		registerButton := anchor.Make("register-button", "Register!", "/register")
+		loginButton := anchor.Make("login-button", "Log in!", "/login")
+
+		navbarAuthComp = buttongroup.Make("nav-auth", "Login/Register Buttons", []templ.Component{loginButton, registerButton})
+	}
+
+	return Make("main-nav", navLinks, navSearch, navbarAuthComp)
 }
 
 func (m *Model) Render(ctx context.Context, w io.Writer) error {
