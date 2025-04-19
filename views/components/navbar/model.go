@@ -53,7 +53,7 @@ func MakeStandardNavbar(ctx context.Context) *Model {
 	var navbarAuthComp templ.Component
 
 	if userEmail != "" {
-		navbarAuthComp = profilebutton.Make()
+		navbarAuthComp = profilebutton.Make(userEmail)
 	} else {
 		registerButton := anchor.Make("register-button", "Register!", "/register")
 		loginButton := anchor.Make("login-button", "Log in!", "/login")

@@ -6,12 +6,15 @@ import (
 )
 
 type Model struct {
+	userEmail string
 }
 
-func Make() *Model {
-	return &Model{}
+func Make(userEmail string) *Model {
+	return &Model{
+		userEmail: userEmail,
+	}
 }
 
 func (m *Model) Render(ctx context.Context, w io.Writer) error {
-	return component().Render(ctx, w)
+	return component(m).Render(ctx, w)
 }

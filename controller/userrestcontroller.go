@@ -32,11 +32,27 @@ func (rc *UserRestController) SetupRoutes(r chi.Router) {
 	r.Route("/auth", func(r chi.Router) {
 		r.Post("/register", rc.registerUser)
 		r.Post("/login", rc.loginUser)
+		r.Get("/logout", rc.logoutUser)
 	})
 	r.Route("/user", func(r chi.Router) {
 		r.Delete("/", rc.deleteUser)
 		r.Put("/", rc.editUser)
 	})
+}
+
+func (rc *UserRestController) logoutUser(w http.ResponseWriter, r *http.Request) {
+	cookie := http.Cookie{
+		Name:     "authCookie",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   0,
+		HttpOnly: true,
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	http.SetCookie(w, &cookie)
+	w.Header().Set("HX-Redirect", "/")
 }
 
 func (rc *UserRestController) registerUser(w http.ResponseWriter, r *http.Request) {
@@ -117,7 +133,7 @@ func (rc *UserRestController) registerUser(w http.ResponseWriter, r *http.Reques
 		Value:    token,
 		Path:     "/",
 		MaxAge:   3600,
-		HttpOnly: true,
+		HttpOnly: false,
 		Secure:   false,
 		SameSite: http.SameSiteLaxMode,
 	}
@@ -203,7 +219,7 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 		Value:    token,
 		Path:     "/",
 		MaxAge:   3600,
-		HttpOnly: true,
+		HttpOnly: false,
 		Secure:   false,
 		SameSite: http.SameSiteLaxMode,
 	}

@@ -1,5 +1,38 @@
 package profilebutton
 
-templ component() {
-    <img src="/images/placeholder_profile_icon.png" width="70px" height="70px"/>
+css panelStyle() {
+    width: 150px;
+    height: 70px;
+    right: 0;
+    top: 110%;
+    background-color: var(--gray-400);
+}
+
+templ component(m *Model) {
+    <div 
+    _="
+    
+    def maybeHide() 
+      wait 0.3s
+      if not my.matches(':hover') 
+        add .d-none to #profile-panel
+    end
+
+    on mouseenter
+      remove .d-none from #profile-panel
+
+    on mouseleave
+      call maybeHide()
+  
+    "
+    class="d-flex flex-column position-relative">
+        <img 
+        src="/images/placeholder_profile_icon.png" width="70px" height="70px"/>
+        <div 
+            id="profile-panel" 
+            class={"rounded", "position-absolute", "d-flex", "flex-column", "justify-content-between", "d-none", panelStyle} >
+            <p class="w-100 text-center">{m.userEmail}</p>
+            <button hx-get="/auth/logout" hx-swap="none" class="btn btn-danger w-100">Log out!</button>
+        </div>
+    </div>
 }
