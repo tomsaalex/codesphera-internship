@@ -12,7 +12,7 @@ import (
 
 type JwtUtil struct {
 	secretKey []byte
-	tokenTTL  int64
+	TokenTTL  int64
 }
 
 var ErrJwtBroken = errors.New("JWT cannot be handled")
@@ -33,7 +33,7 @@ func NewJwtUtil() *JwtUtil {
 	var tokenTTL int64 = 24 * 60 * 60
 	return &JwtUtil{
 		secretKey: byteKey,
-		tokenTTL:  tokenTTL,
+		TokenTTL:  tokenTTL,
 	}
 }
 
@@ -44,7 +44,7 @@ func (ju *JwtUtil) GenerateJWT(subject string) (string, error) {
 			"iss": "awesome-auction-market",
 			"sub": subject,
 			"iat": currentTime,
-			"exp": currentTime + ju.tokenTTL,
+			"exp": currentTime + ju.TokenTTL,
 		})
 
 	signedToken, err := token.SignedString(ju.secretKey)
