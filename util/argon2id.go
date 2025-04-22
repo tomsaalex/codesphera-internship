@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"errors"
+	"runtime"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -43,7 +44,7 @@ func NewArgon2idHash(time, saltLen uint32, memory uint32, threads uint8, keyLen 
 }
 
 func StandardArgon2idHash() *Argon2idHash {
-	return NewArgon2idHash(1, 32, 64*1024, 32, 256)
+	return NewArgon2idHash(4, 32, 64*1024, uint8(runtime.NumCPU()), 32)
 }
 
 func randomSecret(length uint32) ([]byte, error) {
