@@ -5,8 +5,124 @@
 package db
 
 import (
+	"database/sql/driver"
+	"fmt"
+
 	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type AuctionMode string
+
+const (
+	AuctionModeManual   AuctionMode = "manual"
+	AuctionModePriceMet AuctionMode = "price_met"
+)
+
+func (e *AuctionMode) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = AuctionMode(s)
+	case string:
+		*e = AuctionMode(s)
+	default:
+		return fmt.Errorf("unsupported scan type for AuctionMode: %T", src)
+	}
+	return nil
+}
+
+type NullAuctionMode struct {
+	AuctionMode AuctionMode `json:"auction_mode"`
+	Valid       bool        `json:"valid"` // Valid is true if AuctionMode is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullAuctionMode) Scan(value interface{}) error {
+	if value == nil {
+		ns.AuctionMode, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.AuctionMode.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullAuctionMode) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.AuctionMode), nil
+}
+
+func (e AuctionMode) Valid() bool {
+	switch e {
+	case AuctionModeManual,
+		AuctionModePriceMet:
+		return true
+	}
+	return false
+}
+
+type AuctionStatus string
+
+const (
+	AuctionStatusOngoing  AuctionStatus = "ongoing"
+	AuctionStatusFinished AuctionStatus = "finished"
+)
+
+func (e *AuctionStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = AuctionStatus(s)
+	case string:
+		*e = AuctionStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for AuctionStatus: %T", src)
+	}
+	return nil
+}
+
+type NullAuctionStatus struct {
+	AuctionStatus AuctionStatus `json:"auction_status"`
+	Valid         bool          `json:"valid"` // Valid is true if AuctionStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullAuctionStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.AuctionStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.AuctionStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullAuctionStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.AuctionStatus), nil
+}
+
+func (e AuctionStatus) Valid() bool {
+	switch e {
+	case AuctionStatusOngoing,
+		AuctionStatusFinished:
+		return true
+	}
+	return false
+}
+
+type Auction struct {
+	ID            pgtype.UUID   `json:"id"`
+	ProductName   string        `json:"product_name"`
+	ProductDesc   string        `json:"product_desc"`
+	AucMode       AuctionMode   `json:"auc_mode"`
+	AucStatus     AuctionStatus `json:"auc_status"`
+	StartingPrice float32       `json:"starting_price"`
+	TargetPrice   pgtype.Float4 `json:"target_price"`
+	SellerID      pgtype.UUID   `json:"seller_id"`
+}
 
 type Product struct {
 	Name        string  `json:"name"`

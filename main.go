@@ -20,13 +20,17 @@ func main() {
 	queries := db.New(pool)
 
 	userRepository := infrastructure.NewDBUserRepository(queries)
+	auctionRepository := infrastructure.NewDBAuctionRepository(queries)
 
 	serviceDTOMapper := service.NewServiceDTOMapper()
 	argonHelper := util.StandardArgon2idHash()
 	userService := service.NewUserService(userRepository, *serviceDTOMapper, *argonHelper)
+	auctionService := service.NewAuctionService(auctionRepository, *serviceDTOMapper)
 
 	jwtHelper := util.NewJwtUtil()
 	userRestController := controller.NewUserRestController(*userService, *jwtHelper)
+
+	auctionRestController := controller.NewAuctionRestController(*auctionService, *jwtHelper)
 
 	generalRestController := controller.NewGeneralRestController(*jwtHelper)
 
@@ -39,6 +43,7 @@ func main() {
 	userRestController.SetupRoutes(r)
 	generalRestController.SetupRoutes(r)
 	authRestController.SetupRoutes(r)
+	auctionRestController.SetupRoutes(r)
 
 	// Serve images from ./static/images when hitting /images/*
 	fs := http.StripPrefix("/images/", http.FileServer(http.Dir("./static/images")))
