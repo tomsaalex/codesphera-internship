@@ -8,8 +8,9 @@ import (
 type InvalidReason int
 
 const (
-	EMPTY   int = 1
-	INVALID int = 2
+	EMPTY    int = 1
+	INVALID  int = 2
+	NEGATIVE int = 3
 )
 
 type ValidationError struct {

@@ -99,6 +99,7 @@ func (s *UserService) Register(ctx context.Context, userDTO UserRegistrationDTO)
 
 	newUser := s.dtoMapper.RegistrationDTOToUser(userDTO, hashsalt)
 	_, err = s.userRepo.Add(ctx, newUser)
+	// TODO: Return the user returned by the repo instead.
 	return &newUser, err
 }
 

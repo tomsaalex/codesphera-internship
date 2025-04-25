@@ -8,3 +8,7 @@ RETURNING *;
 -- name: GetAllAuctionsByUser :many
 SELECT * FROM auctions
 WHERE seller_id = $1;
+
+-- name: GetAuctionByName :one
+SELECT * FROM auctions
+WHERE product_name = $1 LIMIT 1;

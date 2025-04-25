@@ -31,7 +31,7 @@ func registerContent(viewModel *ViewModel) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"d-flex flex-column flex-grow-1 h-full justify-content-center\"><div class=\"rounded-corners align-self-center w-25 bg-body-secondary rounded\"><div class=\"d-flex flex-column p-4\"><h1 class=\"m-auto\">Register</h1><form id=\"registerForm\" hx-post=\"/auth/register\" hx-select=\"#registerForm\" hx-swap=\"outerHTML\" hx-ext=\"form-json\" class=\"d-flex flex-column align-items-center\" novalidate><div class=\"mb-3 w-75\"><label for=\"inputName\">Full Name</label> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"d-flex flex-column flex-grow-1 justify-content-center\"><div class=\"rounded-corners align-self-center w-25 bg-body-secondary rounded\"><div class=\"d-flex flex-column p-4\"><h1 class=\"m-auto\">Register</h1><form id=\"registerForm\" hx-post=\"/auth/register\" hx-select=\"#registerForm\" hx-swap=\"outerHTML\" hx-ext=\"form-json\" class=\"d-flex flex-column align-items-center\" novalidate><div class=\"mb-3 w-75\"><label for=\"inputName\">Full Name</label> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

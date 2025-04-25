@@ -162,19 +162,16 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 		var authErr *service.AuthError
 		var entityNotFoundErr *infrastructure.EntityNotFoundError
 		var valErr *service.ValidationError
+		var loginPage *loginpage.ViewModel
 
 		if errors.As(err, &authErr) {
 			formErrs.GenericError = "Email or Password are incorrect"
 
-			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
-
-			base.PageSkeleton(loginPage).Render(r.Context(), w)
+			loginPage = loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 		} else if errors.As(err, &entityNotFoundErr) {
 			formErrs.GenericError = "Email or Password are incorrect"
 
-			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
-
-			base.PageSkeleton(loginPage).Render(r.Context(), w)
+			loginPage = loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 		} else if errors.As(err, &valErr) {
 			emailErr, hasEmailErr := valErr.GetField("email")
 			passwordErr, hasPasswordErr := valErr.GetField("password")
@@ -192,16 +189,14 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 				}
 			}
 
-			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
-
-			base.PageSkeleton(loginPage).Render(r.Context(), w)
+			loginPage = loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 		} else {
 
 			formErrs.GenericError = "An unexpected error occurred on our end. Please retry later!"
-			loginPage := loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
-
-			base.PageSkeleton(loginPage).Render(r.Context(), w)
+			loginPage = loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 		}
+
+		base.PageSkeleton(loginPage).Render(r.Context(), w)
 		return
 	}
 

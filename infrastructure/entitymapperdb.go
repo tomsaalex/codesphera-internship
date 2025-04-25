@@ -148,10 +148,9 @@ func (d *EntityMapperDB) dbAuctionStatusToAuctionStatus(aucStatus db.AuctionStat
 }
 
 func (d *EntityMapperDB) AuctionToAddAuctionParams(auction model.Auction) (*db.AddAuctionParams, error) {
-	dbTargetPrice := pgtype.Float4{}
-	err := dbTargetPrice.Scan(auction.TargetPrice)
-	if err != nil {
-		return nil, err
+	dbTargetPrice := pgtype.Float4{
+		Float32: auction.TargetPrice,
+		Valid:   true,
 	}
 
 	dbAuctionStatus, err := d.auctionStatusToDBAuctionStatus(auction.Status)
@@ -164,12 +163,7 @@ func (d *EntityMapperDB) AuctionToAddAuctionParams(auction model.Auction) (*db.A
 		return nil, err
 	}
 
-	pgSellerUUID := pgtype.UUID{}
-	err = pgSellerUUID.Scan(auction.Seller.Id)
-
-	if err != nil {
-		return nil, err
-	}
+	pgSellerUUID := d.uuidToDBUuid(auction.Seller.Id)
 
 	return &db.AddAuctionParams{
 		ProductName:   auction.ProductName,

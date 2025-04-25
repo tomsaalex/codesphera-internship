@@ -25,7 +25,7 @@ func main() {
 	serviceDTOMapper := service.NewServiceDTOMapper()
 	argonHelper := util.StandardArgon2idHash()
 	userService := service.NewUserService(userRepository, *serviceDTOMapper, *argonHelper)
-	auctionService := service.NewAuctionService(auctionRepository, *serviceDTOMapper)
+	auctionService := service.NewAuctionService(auctionRepository, userRepository, *serviceDTOMapper)
 
 	jwtHelper := util.NewJwtUtil()
 	userRestController := controller.NewUserRestController(*userService, *jwtHelper)

@@ -6,7 +6,7 @@ templ Component() {
     {{
         navLinks := navbar.MakeStandardNavLinks()
     }}
-    <footer class="d-block py-3 mb-4">
+    <footer class="d-block pt-3">
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
             for _, navLink := range navLinks {
                 <li class="nav-item"><a href={templ.URL(navLink.LinkDestination)} class="nav-link px-2 text-body-secondary">{navLink.LinkText}</a></li>
