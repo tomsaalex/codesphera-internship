@@ -21,8 +21,8 @@ type Auction struct {
 	ProductDescription string
 	Status             AuctionStatus
 	Mode               AuctionMode
-	StartingPrice      float32
-	TargetPrice        float32
+	StartingPrice      *float32
+	TargetPrice        *float32
 	//Categories         []string
 	//ImageLinks         []string
 

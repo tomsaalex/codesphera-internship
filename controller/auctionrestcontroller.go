@@ -8,6 +8,7 @@ import (
 	"curs1_boilerplate/util"
 	"curs1_boilerplate/views/base"
 	"curs1_boilerplate/views/components/navbar"
+	"curs1_boilerplate/views/pages/aucbrowse"
 	"curs1_boilerplate/views/pages/auccreate"
 	"encoding/json"
 	"errors"
@@ -31,12 +32,18 @@ func NewAuctionRestController(auctionService service.AuctionService, jwtHelper u
 func (rc *AuctionRestController) SetupRoutes(r chi.Router) {
 	r.With(middleware.RequireAuth).Get("/start-auction", rc.createAuctionPage)
 	r.With(middleware.RequireAuth).Post("/auctions", rc.addAuction)
+	r.Get("/search-auctions", rc.browseAuctions)
 }
 
 func (rc *AuctionRestController) createAuctionPage(w http.ResponseWriter, r *http.Request) {
 	createAuctionPage := auccreate.MakeValidAuctionCreationPage(false, navbar.MakeStandardNavbar(r.Context()))
 
 	base.PageSkeleton(createAuctionPage).Render(r.Context(), w)
+}
+
+func (rc *AuctionRestController) browseAuctions(w http.ResponseWriter, r *http.Request) {
+	browseAuctionsPage := aucbrowse.MakeAuctionBrowsePage(navbar.MakeStandardNavbar(r.Context()))
+	base.PageSkeleton(browseAuctionsPage).Render(r.Context(), w)
 }
 
 func (rc *AuctionRestController) addAuction(w http.ResponseWriter, r *http.Request) {

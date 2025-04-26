@@ -1,0 +1,11 @@
+package aucbrowse
+
+import "curs1_boilerplate/views/pages"
+
+templ browseAuctionsContent(viewModel *ViewModel) {
+
+}
+
+templ BrowseAuctions(viewModel *ViewModel, nav templ.Component) {
+    @pages.Common(nav, browseAuctionsContent(viewModel))
+}

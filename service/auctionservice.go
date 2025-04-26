@@ -22,6 +22,14 @@ func NewAuctionService(auctionRepo infrastructure.AuctionRepository, userRepo in
 	}
 }
 
+func (s *AuctionService) sanitizeAuctionDTO(auctionDTO AuctionDTO) AuctionDTO {
+	if auctionDTO.Mode != "Price Met" {
+		auctionDTO.TargetPrice = nil
+	}
+
+	return auctionDTO
+}
+
 func (s *AuctionService) validateAuctionDTO(auctionDTO AuctionDTO) error {
 	ve := NewValidationError()
 	validationSuccessful := true
@@ -56,21 +64,22 @@ func (s *AuctionService) validateAuctionDTO(auctionDTO AuctionDTO) error {
 		validationSuccessful = false
 	}
 
-	if auctionDTO.Mode == "Price Met" && auctionDTO.TargetPrice == nil {
-		ve.fieldErrors["targetPrice"] = EMPTY
-		validationSuccessful = false
-	}
+	if auctionDTO.Mode == "Price Met" {
+		if auctionDTO.TargetPrice == nil {
+			ve.fieldErrors["targetPrice"] = EMPTY
+			validationSuccessful = false
+		}
 
-	if auctionDTO.TargetPrice != nil && *auctionDTO.TargetPrice < 0 {
-		ve.fieldErrors["targetPrice"] = NEGATIVE
-		validationSuccessful = false
-	}
+		if auctionDTO.TargetPrice != nil && *auctionDTO.TargetPrice < 0 {
+			ve.fieldErrors["targetPrice"] = NEGATIVE
+			validationSuccessful = false
+		}
 
-	if auctionDTO.TargetPrice != nil && *auctionDTO.TargetPrice < *auctionDTO.StartingPrice {
-		ve.fieldErrors["targetPrice"] = INVALID
-		validationSuccessful = false
+		if auctionDTO.TargetPrice != nil && *auctionDTO.TargetPrice < *auctionDTO.StartingPrice {
+			ve.fieldErrors["targetPrice"] = INVALID
+			validationSuccessful = false
+		}
 	}
-
 	if validationSuccessful {
 		return nil
 	}
@@ -83,6 +92,8 @@ func (s *AuctionService) AddAuction(ctx context.Context, auctionDTO AuctionDTO) 
 	if err != nil {
 		return nil, err
 	}
+
+	auctionDTO = s.sanitizeAuctionDTO(auctionDTO)
 
 	_, err = s.auctionRepo.GetAuctionByName(ctx, auctionDTO.ProductName)
 

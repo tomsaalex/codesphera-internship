@@ -40,6 +40,7 @@ func MakeStandardNavLinks() []NavLink {
 	navLinks = append(navLinks, NavLink{LinkText: "Home", LinkDestination: "/"})
 	navLinks = append(navLinks, NavLink{LinkText: "About Us", LinkDestination: "#"})
 	navLinks = append(navLinks, NavLink{LinkText: "Start An Auction", LinkDestination: "/start-auction"})
+	navLinks = append(navLinks, NavLink{LinkText: "Browse Auctions", LinkDestination: "/search-auctions"})
 	return navLinks
 }
 

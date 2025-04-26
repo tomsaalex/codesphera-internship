@@ -31,13 +31,18 @@ func (m *ServiceDTOMapper) AuctionDTOToAuction(auctionDTO AuctionDTO, seller *mo
 		return nil, err
 	}
 
+	var targetPrice *float32 = nil
+	if auctionDTO.TargetPrice != nil {
+		targetPrice = auctionDTO.TargetPrice
+	}
+
 	return &model.Auction{
 		ProductName:        auctionDTO.ProductName,
 		ProductDescription: auctionDTO.ProductDesc,
 		Status:             auctionStatus,
 		Mode:               auctionMode,
-		StartingPrice:      *auctionDTO.StartingPrice,
-		TargetPrice:        *auctionDTO.TargetPrice,
+		StartingPrice:      auctionDTO.StartingPrice,
+		TargetPrice:        targetPrice,
 		Seller:             seller,
 	}, nil
 }

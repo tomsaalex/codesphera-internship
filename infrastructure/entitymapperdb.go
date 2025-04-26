@@ -69,17 +69,18 @@ func (d *EntityMapperDB) DBAuctionToAuction(dbAuction db.Auction, seller *model.
 	}
 
 	if !dbAuction.ID.Valid {
-		return nil, fmt.Errorf("couldn't convert db auction to model Auction - invalid ID.")
+		return nil, fmt.Errorf("couldn't convert db auction to model Auction - invalid ID")
 	}
 	auctionUUID, err := uuid.FromBytes(dbAuction.ID.Bytes[:])
 	if err != nil {
 		return nil, err
 	}
 
+	var targetPrice *float32
 	if !dbAuction.TargetPrice.Valid {
-		return nil, fmt.Errorf("couldn't convert db auction to model Auction - invalid target price")
+		targetPrice = nil
 	}
-	targetPrice := dbAuction.TargetPrice.Float32
+	targetPrice = &dbAuction.TargetPrice.Float32
 
 	auction := &model.Auction{
 		Id:                 auctionUUID,
@@ -87,7 +88,7 @@ func (d *EntityMapperDB) DBAuctionToAuction(dbAuction db.Auction, seller *model.
 		ProductDescription: dbAuction.ProductDesc,
 		Mode:               dbAuctionMode,
 		Status:             dbAuctionStatus,
-		StartingPrice:      dbAuction.StartingPrice,
+		StartingPrice:      &dbAuction.StartingPrice,
 		TargetPrice:        targetPrice,
 		Seller:             seller,
 	}
@@ -148,9 +149,11 @@ func (d *EntityMapperDB) dbAuctionStatusToAuctionStatus(aucStatus db.AuctionStat
 }
 
 func (d *EntityMapperDB) AuctionToAddAuctionParams(auction model.Auction) (*db.AddAuctionParams, error) {
-	dbTargetPrice := pgtype.Float4{
-		Float32: auction.TargetPrice,
-		Valid:   true,
+	var dbTargetPrice pgtype.Float4
+	if auction.TargetPrice == nil {
+		dbTargetPrice = pgtype.Float4{Valid: false}
+	} else {
+		dbTargetPrice = pgtype.Float4{Float32: *auction.TargetPrice, Valid: true}
 	}
 
 	dbAuctionStatus, err := d.auctionStatusToDBAuctionStatus(auction.Status)
@@ -170,7 +173,7 @@ func (d *EntityMapperDB) AuctionToAddAuctionParams(auction model.Auction) (*db.A
 		ProductDesc:   auction.ProductDescription,
 		AucMode:       dbAuctionMode,
 		AucStatus:     dbAuctionStatus,
-		StartingPrice: auction.StartingPrice,
+		StartingPrice: *auction.StartingPrice,
 		TargetPrice:   dbTargetPrice,
 		SellerID:      pgSellerUUID,
 	}, nil

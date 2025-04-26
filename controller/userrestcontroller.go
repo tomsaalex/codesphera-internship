@@ -191,7 +191,6 @@ func (rc *UserRestController) loginUser(w http.ResponseWriter, r *http.Request) 
 
 			loginPage = loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 		} else {
-
 			formErrs.GenericError = "An unexpected error occurred on our end. Please retry later!"
 			loginPage = loginpage.MakeErroredLoginPage(&formErrs, navbar.MakeStandardNavbar(r.Context()))
 		}
