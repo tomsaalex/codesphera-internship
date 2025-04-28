@@ -124,6 +124,19 @@ type Auction struct {
 	SellerID      pgtype.UUID   `json:"seller_id"`
 }
 
+type AuctionDetail struct {
+	ID            pgtype.UUID   `json:"id"`
+	ProductName   string        `json:"product_name"`
+	ProductDesc   string        `json:"product_desc"`
+	AucMode       AuctionMode   `json:"auc_mode"`
+	AucStatus     AuctionStatus `json:"auc_status"`
+	StartingPrice float32       `json:"starting_price"`
+	TargetPrice   pgtype.Float4 `json:"target_price"`
+	SellerID      pgtype.UUID   `json:"seller_id"`
+	SellerName    string        `json:"seller_name"`
+	SellerEmail   string        `json:"seller_email"`
+}
+
 type Product struct {
 	Name        string  `json:"name"`
 	Description string  `json:"description"`

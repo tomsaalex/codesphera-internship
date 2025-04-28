@@ -42,7 +42,8 @@ func (rc *AuctionRestController) createAuctionPage(w http.ResponseWriter, r *htt
 }
 
 func (rc *AuctionRestController) browseAuctions(w http.ResponseWriter, r *http.Request) {
-	browseAuctionsPage := aucbrowse.MakeAuctionBrowsePage(navbar.MakeStandardNavbar(r.Context()))
+	auctions, _ := rc.auctionService.GetAuctions(r.Context())
+	browseAuctionsPage := aucbrowse.MakeAuctionBrowsePage(auctions, navbar.MakeStandardNavbar(r.Context()))
 	base.PageSkeleton(browseAuctionsPage).Render(r.Context(), w)
 }
 
@@ -58,6 +59,7 @@ func (rc *AuctionRestController) addAuction(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	// TODO: I despise using raw strings like this with my entire being, but it'll have to do for now
 	formHasTargetPrice := auctionDTO.Mode == "Price Met"
 
 	_, err = rc.auctionService.AddAuction(r.Context(), auctionDTO)

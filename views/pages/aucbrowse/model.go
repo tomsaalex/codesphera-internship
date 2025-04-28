@@ -2,17 +2,27 @@ package aucbrowse
 
 import (
 	"context"
+	"curs1_boilerplate/model"
+	"curs1_boilerplate/views/components/auccard"
 	"curs1_boilerplate/views/components/navbar"
 	"io"
 )
 
 type ViewModel struct {
-	navbar *navbar.Model
+	auctionCards []*auccard.Model
+	navbar       *navbar.Model
 }
 
-func MakeAuctionBrowsePage(navbar *navbar.Model) *ViewModel {
+func MakeAuctionBrowsePage(auctions []model.Auction, navbar *navbar.Model) *ViewModel {
+	auctionCards := make([]*auccard.Model, len(auctions))
+
+	for i, auction := range auctions {
+		auctionCards[i] = auccard.MakeAuctionCard(auction)
+	}
+
 	return &ViewModel{
-		navbar: navbar,
+		auctionCards: auctionCards,
+		navbar:       navbar,
 	}
 }
 

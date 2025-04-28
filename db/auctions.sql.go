@@ -54,19 +54,19 @@ func (q *Queries) AddAuction(ctx context.Context, arg AddAuctionParams) (Auction
 }
 
 const getAllAuctionsByUser = `-- name: GetAllAuctionsByUser :many
-SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, seller_id FROM auctions
+SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, seller_id, seller_name, seller_email FROM auction_details 
 WHERE seller_id = $1
 `
 
-func (q *Queries) GetAllAuctionsByUser(ctx context.Context, sellerID pgtype.UUID) ([]Auction, error) {
+func (q *Queries) GetAllAuctionsByUser(ctx context.Context, sellerID pgtype.UUID) ([]AuctionDetail, error) {
 	rows, err := q.db.Query(ctx, getAllAuctionsByUser, sellerID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Auction{}
+	items := []AuctionDetail{}
 	for rows.Next() {
-		var i Auction
+		var i AuctionDetail
 		if err := rows.Scan(
 			&i.ID,
 			&i.ProductName,
@@ -76,6 +76,8 @@ func (q *Queries) GetAllAuctionsByUser(ctx context.Context, sellerID pgtype.UUID
 			&i.StartingPrice,
 			&i.TargetPrice,
 			&i.SellerID,
+			&i.SellerName,
+			&i.SellerEmail,
 		); err != nil {
 			return nil, err
 		}
@@ -88,13 +90,13 @@ func (q *Queries) GetAllAuctionsByUser(ctx context.Context, sellerID pgtype.UUID
 }
 
 const getAuctionByName = `-- name: GetAuctionByName :one
-SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, seller_id FROM auctions
+SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, seller_id, seller_name, seller_email FROM auction_details
 WHERE product_name = $1 LIMIT 1
 `
 
-func (q *Queries) GetAuctionByName(ctx context.Context, productName string) (Auction, error) {
+func (q *Queries) GetAuctionByName(ctx context.Context, productName string) (AuctionDetail, error) {
 	row := q.db.QueryRow(ctx, getAuctionByName, productName)
-	var i Auction
+	var i AuctionDetail
 	err := row.Scan(
 		&i.ID,
 		&i.ProductName,
@@ -104,6 +106,43 @@ func (q *Queries) GetAuctionByName(ctx context.Context, productName string) (Auc
 		&i.StartingPrice,
 		&i.TargetPrice,
 		&i.SellerID,
+		&i.SellerName,
+		&i.SellerEmail,
 	)
 	return i, err
+}
+
+const getAuctions = `-- name: GetAuctions :many
+SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, seller_id, seller_name, seller_email FROM auction_details
+`
+
+func (q *Queries) GetAuctions(ctx context.Context) ([]AuctionDetail, error) {
+	rows, err := q.db.Query(ctx, getAuctions)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []AuctionDetail{}
+	for rows.Next() {
+		var i AuctionDetail
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProductName,
+			&i.ProductDesc,
+			&i.AucMode,
+			&i.AucStatus,
+			&i.StartingPrice,
+			&i.TargetPrice,
+			&i.SellerID,
+			&i.SellerName,
+			&i.SellerEmail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

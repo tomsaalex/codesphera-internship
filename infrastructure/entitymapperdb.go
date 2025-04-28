@@ -47,16 +47,6 @@ func (d *EntityMapperDB) UserToUpdateUserParams(user model.User) db.UpdateUserPa
 
 // Auction
 
-func (d *EntityMapperDB) DBAuctionsToAuction(dbAuctions []db.Auction, seller *model.User) ([]model.Auction, error) {
-	modelAuctions := make([]model.Auction, len(dbAuctions))
-	for i, dbAuction := range dbAuctions {
-		modelAuction, err := d.DBAuctionToAuction(dbAuction, seller)
-		modelAuctions[i] = *modelAuction
-		return nil, err
-	}
-	return modelAuctions, nil
-}
-
 func (d *EntityMapperDB) DBAuctionToAuction(dbAuction db.Auction, seller *model.User) (*model.Auction, error) {
 	dbAuctionStatus, err := d.dbAuctionStatusToAuctionStatus(dbAuction.AucStatus)
 	if err != nil {
@@ -81,6 +71,63 @@ func (d *EntityMapperDB) DBAuctionToAuction(dbAuction db.Auction, seller *model.
 		targetPrice = nil
 	}
 	targetPrice = &dbAuction.TargetPrice.Float32
+
+	auction := &model.Auction{
+		Id:                 auctionUUID,
+		ProductName:        dbAuction.ProductName,
+		ProductDescription: dbAuction.ProductDesc,
+		Mode:               dbAuctionMode,
+		Status:             dbAuctionStatus,
+		StartingPrice:      &dbAuction.StartingPrice,
+		TargetPrice:        targetPrice,
+		Seller:             seller,
+	}
+
+	return auction, nil
+}
+
+func (d *EntityMapperDB) DBAuctionDetailsToAuctions(dbAuctions []db.AuctionDetail) ([]model.Auction, error) {
+	modelAuctions := make([]model.Auction, len(dbAuctions))
+	for i, dbAuction := range dbAuctions {
+		modelAuction, err := d.DBAuctionDetailToAuction(dbAuction)
+		modelAuctions[i] = *modelAuction
+		if err != nil {
+			return nil, err
+		}
+	}
+	return modelAuctions, nil
+}
+
+func (d *EntityMapperDB) DBAuctionDetailToAuction(dbAuction db.AuctionDetail) (*model.Auction, error) {
+	dbAuctionStatus, err := d.dbAuctionStatusToAuctionStatus(dbAuction.AucStatus)
+	if err != nil {
+		return nil, err
+	}
+
+	dbAuctionMode, err := d.dbAuctionModeToAuctionMode(dbAuction.AucMode)
+	if err != nil {
+		return nil, err
+	}
+
+	if !dbAuction.ID.Valid {
+		return nil, fmt.Errorf("couldn't convert db auction to model Auction - invalid ID")
+	}
+	auctionUUID, err := uuid.FromBytes(dbAuction.ID.Bytes[:])
+	if err != nil {
+		return nil, err
+	}
+
+	var targetPrice *float32
+	if !dbAuction.TargetPrice.Valid {
+		targetPrice = nil
+	}
+	targetPrice = &dbAuction.TargetPrice.Float32
+
+	seller := &model.User{
+		Id:       dbAuction.SellerID.Bytes,
+		Fullname: dbAuction.SellerName,
+		Email:    dbAuction.SellerEmail,
+	}
 
 	auction := &model.Auction{
 		Id:                 auctionUUID,

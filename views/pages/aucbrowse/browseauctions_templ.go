@@ -31,6 +31,20 @@ func browseAuctionsContent(viewModel *ViewModel) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"d-flex h-100\"><div class=\"flex-basis-20 bg-dark-subtle\" id=\"filterContainer\"><p class=\"text-center\">Imagine the filters here</p></div><div class=\"d-flex flex-column flex-basis-80 align-items-center row-gap-3\" id=\"auctionsList\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, auction := range viewModel.auctionCards {
+			templ_7745c5c3_Err = auction.Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		return nil
 	})
 }

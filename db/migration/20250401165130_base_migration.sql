@@ -25,7 +25,24 @@ CREATE TABLE auctions (
 	seller_id UUID references users(id)
 );
 
+CREATE VIEW auction_details AS
+SELECT
+    a.id,
+    a.product_name,
+    a.product_desc,
+    a.auc_mode,
+    a.auc_status,
+    a.starting_price,
+    a.target_price,
+    u.id AS seller_id,
+    u.fullname AS seller_name,
+    u.email AS seller_email
+FROM auctions a
+JOIN users u ON a.seller_id = u.id;
+
 -- +goose Down
+DROP VIEW IF EXISTS auction_details;
+
 DROP TABLE IF EXISTS auctions;
 DROP TABLE IF EXISTS users;
 

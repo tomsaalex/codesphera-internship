@@ -15,6 +15,20 @@ type DBAuctionRepo struct {
 	mapper  EntityMapperDB
 }
 
+func (r *DBAuctionRepo) GetAuctions(ctx context.Context) ([]model.Auction, error) {
+	dbAuctions, err := r.queries.GetAuctions(ctx)
+	if err != nil {
+		return nil, &RepositoryError{Message: "if this fails, something broke somewhere"}
+	}
+
+	auctions, err := r.mapper.DBAuctionDetailsToAuctions(dbAuctions)
+	if err != nil {
+		return nil, &RepositoryError{Message: "Couldn't map db auctions to domain auctions"}
+	}
+
+	return auctions, nil
+}
+
 func (r *DBAuctionRepo) GetAllAuctionsByUser(ctx context.Context, seller model.User) ([]model.Auction, error) {
 	dbAuctions, err := r.queries.GetAllAuctionsByUser(ctx, r.mapper.uuidToDBUuid(seller.Id))
 	if err != nil {
@@ -22,7 +36,7 @@ func (r *DBAuctionRepo) GetAllAuctionsByUser(ctx context.Context, seller model.U
 		return nil, &RepositoryError{Message: "database couldn't retrieve auctions"}
 	}
 
-	auctions, err := r.mapper.DBAuctionsToAuction(dbAuctions, &seller)
+	auctions, err := r.mapper.DBAuctionDetailsToAuctions(dbAuctions)
 	if err != nil {
 		return nil, &RepositoryError{Message: "entity couldn't be mapped to DB model"}
 	}
@@ -36,15 +50,7 @@ func (r *DBAuctionRepo) GetAuctionByName(ctx context.Context, productName string
 		return nil, &RepositoryError{Message: "database couldn't retrieve auction"}
 	}
 
-	dbAuctionSeller, err := r.queries.GetUserById(ctx, dbAuction.SellerID)
-	if err != nil {
-		// TODO: Handle this better
-		return nil, &RepositoryError{Message: "database couldn't retrieve auction's seller"}
-	}
-
-	auctionSeller := r.mapper.DBUserToUser(dbAuctionSeller)
-
-	auction, err := r.mapper.DBAuctionToAuction(dbAuction, auctionSeller)
+	auction, err := r.mapper.DBAuctionDetailToAuction(dbAuction)
 
 	if err != nil {
 		return nil, &RepositoryError{Message: "entity couldn't be mapped to DB model"}

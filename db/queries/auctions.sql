@@ -1,3 +1,6 @@
+-- name: GetAuctions :many
+SELECT * FROM auction_details;
+
 -- name: AddAuction :one
 insert into auctions
 (seller_id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price)
@@ -6,9 +9,9 @@ values
 RETURNING *;
 
 -- name: GetAllAuctionsByUser :many
-SELECT * FROM auctions
+SELECT * FROM auction_details 
 WHERE seller_id = $1;
 
 -- name: GetAuctionByName :one
-SELECT * FROM auctions
+SELECT * FROM auction_details
 WHERE product_name = $1 LIMIT 1;

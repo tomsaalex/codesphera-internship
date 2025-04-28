@@ -116,3 +116,7 @@ func (s *AuctionService) AddAuction(ctx context.Context, auctionDTO AuctionDTO) 
 	savedAuction, err := s.auctionRepo.Add(ctx, *newAuction)
 	return savedAuction, err
 }
+
+func (s *AuctionService) GetAuctions(ctx context.Context) ([]model.Auction, error) {
+	return s.auctionRepo.GetAuctions(ctx)
+}

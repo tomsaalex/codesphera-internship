@@ -1,0 +1,28 @@
+package auccard
+
+css cardHeader(){
+    background-color: var(--bs-orange);
+    font-weight: bold;
+}
+
+css cardImage() {
+    border-radius: 0 0 0 var(--bs-border-radius);
+}
+
+css cardBackground() {
+    background-color: #ade4ff;
+}
+
+templ AuctionCard(model *Model) {
+    <div class="d-flex flex-column w-75 rounded">
+        <p class={"fs-6", cardHeader(), "rounded-top", "p-1", "text-light"}>{model.auction.Seller.Fullname}</p>
+        <div class={"d-flex", "rounded-bottom", cardBackground()}>    
+            <img class={cardImage()} src="/images/img_placeholder.jpg" width="200px" height="200px"/>
+            <div class="d-flex flex-column mx-2 w-100">
+                <p class="fs-1">{model.auction.ProductName}</p>
+                <hr class="my-1">
+                <p class="fs-4">{model.auction.ProductDescription}</p>
+            </div>
+        </div>
+    </div>
+}

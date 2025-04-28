@@ -3,7 +3,17 @@ package aucbrowse
 import "curs1_boilerplate/views/pages"
 
 templ browseAuctionsContent(viewModel *ViewModel) {
+    <div class="d-flex h-100">
+        <div class="flex-basis-20 bg-dark-subtle" id="filterContainer">
+            <p class="text-center">Imagine the filters here</p>
+        </div>
 
+        <div class="d-flex flex-column flex-basis-80 align-items-center row-gap-3" id="auctionsList">
+            for _, auction := range viewModel.auctionCards {
+                @auction
+            }
+        </div>
+    </div>
 }
 
 templ BrowseAuctions(viewModel *ViewModel, nav templ.Component) {
