@@ -33,10 +33,22 @@ templ auctionCreationContent(viewModel *ViewModel) {
                     </div>
 
                     <div class="mb-3">
-                        <label for="status" class="form-label">Status</label>
+                        <label for="category" class="form-label">Product Category</label>
+                        <select class="form-select" id="category" name="category" required>
+                            for _, category := range viewModel.categories {
+                                <option value={category.Name}>{category.Name}</option>
+                            }
+                        </select>
+                        if viewModel.categoryHasError {
+                            <p class="text-danger">{viewModel.categoryError}</p>
+                        }
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Scheduling</label>
                         <select class="form-select" id="status" name="status" required>
-                            <option value="Ongoing">Ongoing</option>
-                            <option value="Finished">Finished</option>
+                            <option value="Immediate">Immediate Start</option>
+                            <option value="Scheduled">Scheduled Start</option>
                         </select>
                         if viewModel.statusHasError {
                             <p class="text-danger">{viewModel.statusError}</p>
@@ -44,7 +56,7 @@ templ auctionCreationContent(viewModel *ViewModel) {
                     </div>
 
                     <div class="mb-3">
-                        <label for="mode" class="form-label">Mode</label>
+                        <label for="mode" class="form-label">Auction Mode</label>
                         <select 
                         class="form-select" 
                         id="mode" 

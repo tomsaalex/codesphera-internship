@@ -1,9 +1,23 @@
 package searchbar
 
 templ component(m *Model) {
-    <form id={m.id} role="search" class="w-75 input-group flex-nowrap" style="height:3rem">
+    /*<form action="/search-auctions" form-method="GET" id={m.id} role="search" class="w-75 input-group flex-nowrap" style="height:3rem">
         <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input type="text" class="form-control" placeholder={m.placeholder} aria-label={m.label} aria-describedby="addon-wrapping">
-        <button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
+        <input type="text" class="form-control" name="productQuery" placeholder={m.placeholder} value={m.initialText} aria-label={m.label} aria-describedby="addon-wrapping">
+        <button class="btn btn-outline-secondary" type="submit" id="search-button">Search</button>
+    </form>*/
+    // TODO: Replace ID with something from the model
+    <form hx-post="/auction-page/1" hx-ext="form-json" hx-swap="innerHTML" hx-target="#auctionsList" hx-trigger="keyup changed delay:300ms from:#searchInput" id="browseAuctionsForm" role="search" class="w-75 input-group flex-nowrap" style="height:3rem">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input id="searchInput" form="browseAuctionsForm"  type="text" class="form-control" name="productQuery" placeholder={m.placeholder} aria-label={m.label} aria-describedby="addon-wrapping">
+        <button class="btn btn-outline-secondary" type="submit" id="search-button">Search</button>
     </form>
 }
+
+/*
+<div id={m.id} role="search" class="w-75 input-group flex-nowrap" style="height:3rem">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input hx-get="/search-auctions" hx-trigger="click from:#search-button" hx-ext="form-json" hx-swap="none" type="text" class="form-control" name="productQuery" placeholder={m.placeholder} aria-label={m.label} aria-describedby="addon-wrapping">
+        <button class="btn btn-outline-secondary" type="submit" id="search-button">Search</button>
+    </div>
+    */

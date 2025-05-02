@@ -18,7 +18,7 @@ func (m *ServiceDTOMapper) RegistrationDTOToUser(userDTO UserRegistrationDTO, ha
 	}
 }
 
-func (m *ServiceDTOMapper) AuctionDTOToAuction(auctionDTO AuctionDTO, seller *model.User) (*model.Auction, error) {
+func (m *ServiceDTOMapper) AuctionDTOToAuction(auctionDTO AuctionDTO, seller *model.User, categories []model.Category) (*model.Auction, error) {
 	auctionMode, err := m.stringToAuctionMode(auctionDTO.Mode)
 
 	if err != nil {
@@ -36,9 +36,22 @@ func (m *ServiceDTOMapper) AuctionDTOToAuction(auctionDTO AuctionDTO, seller *mo
 		targetPrice = auctionDTO.TargetPrice
 	}
 
+	var category *model.Category = nil
+
+	for _, cat := range categories {
+		if auctionDTO.Category == cat.Name {
+			category = &cat
+		}
+	}
+
+	if category == nil {
+		return nil, fmt.Errorf("couldn't identify given category")
+	}
+
 	return &model.Auction{
 		ProductName:        auctionDTO.ProductName,
 		ProductDescription: auctionDTO.ProductDesc,
+		Category:           category,
 		Status:             auctionStatus,
 		Mode:               auctionMode,
 		StartingPrice:      auctionDTO.StartingPrice,
@@ -54,21 +67,19 @@ func (s *ServiceDTOMapper) stringToAuctionMode(rawMode string) (model.AuctionMod
 	case "Price Met":
 		return model.AM_Price_Met, nil
 	default:
-		// TODO: Reconsider whether this is necessary... this case should be caught by validator.. but still
-		// Make the error nicer, too
 		return model.AM_Manual, fmt.Errorf("couldn't convert string AuctionMode enum to model")
 	}
 }
 
 func (s *ServiceDTOMapper) stringToAuctionStatus(rawStatus string) (model.AuctionStatus, error) {
 	switch rawStatus {
-	case "Ongoing":
+	case "Scheduled":
+		return model.AS_Scheduled, nil
+	case "Immediate":
 		return model.AS_Ongoing, nil
 	case "Finished":
 		return model.AS_Finished, nil
 	default:
-		// TODO: Reconsider whether this is necessary... this case should be caught by validator.. but still
-		// Make the error nicer, too
 		return model.AS_Ongoing, fmt.Errorf("couldn't convert db AuctionStatus enum to model variant")
 	}
 }

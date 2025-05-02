@@ -1,6 +1,10 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type AuctionMode int
 type AuctionStatus int
@@ -11,8 +15,9 @@ const (
 )
 
 const (
-	AS_Ongoing  AuctionStatus = 0
-	AS_Finished AuctionStatus = 1
+	AS_Ongoing   AuctionStatus = 0
+	AS_Finished  AuctionStatus = 1
+	AS_Scheduled AuctionStatus = 2
 )
 
 type Auction struct {
@@ -23,8 +28,10 @@ type Auction struct {
 	Mode               AuctionMode
 	StartingPrice      *float32
 	TargetPrice        *float32
+	CreatedAt          time.Time
 	//Categories         []string
 	//ImageLinks         []string
 
-	Seller *User
+	Category *Category
+	Seller   *User
 }

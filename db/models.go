@@ -65,8 +65,9 @@ func (e AuctionMode) Valid() bool {
 type AuctionStatus string
 
 const (
-	AuctionStatusOngoing  AuctionStatus = "ongoing"
-	AuctionStatusFinished AuctionStatus = "finished"
+	AuctionStatusScheduled AuctionStatus = "scheduled"
+	AuctionStatusOngoing   AuctionStatus = "ongoing"
+	AuctionStatusFinished  AuctionStatus = "finished"
 )
 
 func (e *AuctionStatus) Scan(src interface{}) error {
@@ -106,7 +107,8 @@ func (ns NullAuctionStatus) Value() (driver.Value, error) {
 
 func (e AuctionStatus) Valid() bool {
 	switch e {
-	case AuctionStatusOngoing,
+	case AuctionStatusScheduled,
+		AuctionStatusOngoing,
 		AuctionStatusFinished:
 		return true
 	}
@@ -114,34 +116,38 @@ func (e AuctionStatus) Valid() bool {
 }
 
 type Auction struct {
-	ID            pgtype.UUID   `json:"id"`
-	ProductName   string        `json:"product_name"`
-	ProductDesc   string        `json:"product_desc"`
-	AucMode       AuctionMode   `json:"auc_mode"`
-	AucStatus     AuctionStatus `json:"auc_status"`
-	StartingPrice float32       `json:"starting_price"`
-	TargetPrice   pgtype.Float4 `json:"target_price"`
-	SellerID      pgtype.UUID   `json:"seller_id"`
+	ID            pgtype.UUID      `json:"id"`
+	ProductName   string           `json:"product_name"`
+	ProductDesc   string           `json:"product_desc"`
+	AucMode       AuctionMode      `json:"auc_mode"`
+	AucStatus     AuctionStatus    `json:"auc_status"`
+	StartingPrice float32          `json:"starting_price"`
+	TargetPrice   pgtype.Float4    `json:"target_price"`
+	CreatedAt     pgtype.Timestamp `json:"created_at"`
+	CategoryID    pgtype.UUID      `json:"category_id"`
+	SellerID      pgtype.UUID      `json:"seller_id"`
 }
 
 type AuctionDetail struct {
-	ID            pgtype.UUID   `json:"id"`
-	ProductName   string        `json:"product_name"`
-	ProductDesc   string        `json:"product_desc"`
-	AucMode       AuctionMode   `json:"auc_mode"`
-	AucStatus     AuctionStatus `json:"auc_status"`
-	StartingPrice float32       `json:"starting_price"`
-	TargetPrice   pgtype.Float4 `json:"target_price"`
-	SellerID      pgtype.UUID   `json:"seller_id"`
-	SellerName    string        `json:"seller_name"`
-	SellerEmail   string        `json:"seller_email"`
+	ID            pgtype.UUID      `json:"id"`
+	ProductName   string           `json:"product_name"`
+	ProductDesc   string           `json:"product_desc"`
+	AucMode       AuctionMode      `json:"auc_mode"`
+	AucStatus     AuctionStatus    `json:"auc_status"`
+	StartingPrice float32          `json:"starting_price"`
+	TargetPrice   pgtype.Float4    `json:"target_price"`
+	CreatedAt     pgtype.Timestamp `json:"created_at"`
+	SellerID      pgtype.UUID      `json:"seller_id"`
+	SellerName    string           `json:"seller_name"`
+	SellerEmail   string           `json:"seller_email"`
+	CategoryID    pgtype.UUID      `json:"category_id"`
+	CategoryName  string           `json:"category_name"`
+	TotalRows     int64            `json:"total_rows"`
 }
 
-type Product struct {
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Price       float64 `json:"price"`
-	Issold      bool    `json:"issold"`
+type Category struct {
+	ID           pgtype.UUID `json:"id"`
+	CategoryName string      `json:"category_name"`
 }
 
 type User struct {

@@ -7,9 +7,10 @@ import (
 )
 
 type AuctionRepository interface {
-	GetAuctions(ctx context.Context) ([]model.Auction, error)
+	GetAuctions(ctx context.Context, auctionFilter AuctionFilter) ([]model.Auction, error)
 	GetAllAuctionsByUser(ctx context.Context, seller model.User) ([]model.Auction, error)
 	GetAuctionByName(ctx context.Context, productName string) (*model.Auction, error)
+	GetCategories(ctx context.Context) ([]model.Category, error)
 	Add(ctx context.Context, newAuction model.Auction) (*model.Auction, error)
 }
 

@@ -1,0 +1,33 @@
+package pagenav
+
+templ PaginationNav(vm *ViewModel) {
+    <nav aria-label="Auction Pages Navigation">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="First">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>   
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&lsaquo;</span>
+                </a>
+            </li>
+
+            for _, pageLink := range vm.pages {
+                <li class="page-item"><a class={"page-link", templ.KV("active", pageLink.isSelected)} href={templ.URL(pageLink.GetLink())}>{pageLink.pageNum}</a></li>    
+            }
+
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&rsaquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+}

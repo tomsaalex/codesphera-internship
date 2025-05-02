@@ -1,0 +1,9 @@
+package auclist
+
+templ PaginatedAuctionList(viewModel *ViewModel) {
+    for _, auction := range viewModel.auctionCards {
+        @auction
+    }
+
+    @viewModel.pageNav
+}

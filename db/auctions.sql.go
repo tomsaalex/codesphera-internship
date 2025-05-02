@@ -13,31 +13,35 @@ import (
 
 const addAuction = `-- name: AddAuction :one
 insert into auctions
-(seller_id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price)
+(seller_id, category_id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at)
 values
-($1, $2, $3, $4, $5, $6, $7)
-RETURNING id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, seller_id
+($1, $2, $3, $4, $5, $6, $7, $8, $9)
+RETURNING id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at, category_id, seller_id
 `
 
 type AddAuctionParams struct {
-	SellerID      pgtype.UUID   `json:"seller_id"`
-	ProductName   string        `json:"product_name"`
-	ProductDesc   string        `json:"product_desc"`
-	AucMode       AuctionMode   `json:"auc_mode"`
-	AucStatus     AuctionStatus `json:"auc_status"`
-	StartingPrice float32       `json:"starting_price"`
-	TargetPrice   pgtype.Float4 `json:"target_price"`
+	SellerID      pgtype.UUID      `json:"seller_id"`
+	CategoryID    pgtype.UUID      `json:"category_id"`
+	ProductName   string           `json:"product_name"`
+	ProductDesc   string           `json:"product_desc"`
+	AucMode       AuctionMode      `json:"auc_mode"`
+	AucStatus     AuctionStatus    `json:"auc_status"`
+	StartingPrice float32          `json:"starting_price"`
+	TargetPrice   pgtype.Float4    `json:"target_price"`
+	CreatedAt     pgtype.Timestamp `json:"created_at"`
 }
 
 func (q *Queries) AddAuction(ctx context.Context, arg AddAuctionParams) (Auction, error) {
 	row := q.db.QueryRow(ctx, addAuction,
 		arg.SellerID,
+		arg.CategoryID,
 		arg.ProductName,
 		arg.ProductDesc,
 		arg.AucMode,
 		arg.AucStatus,
 		arg.StartingPrice,
 		arg.TargetPrice,
+		arg.CreatedAt,
 	)
 	var i Auction
 	err := row.Scan(
@@ -48,13 +52,15 @@ func (q *Queries) AddAuction(ctx context.Context, arg AddAuctionParams) (Auction
 		&i.AucStatus,
 		&i.StartingPrice,
 		&i.TargetPrice,
+		&i.CreatedAt,
+		&i.CategoryID,
 		&i.SellerID,
 	)
 	return i, err
 }
 
 const getAllAuctionsByUser = `-- name: GetAllAuctionsByUser :many
-SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, seller_id, seller_name, seller_email FROM auction_details 
+SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at, seller_id, seller_name, seller_email, category_id, category_name, total_rows FROM auction_details 
 WHERE seller_id = $1
 `
 
@@ -75,9 +81,13 @@ func (q *Queries) GetAllAuctionsByUser(ctx context.Context, sellerID pgtype.UUID
 			&i.AucStatus,
 			&i.StartingPrice,
 			&i.TargetPrice,
+			&i.CreatedAt,
 			&i.SellerID,
 			&i.SellerName,
 			&i.SellerEmail,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.TotalRows,
 		); err != nil {
 			return nil, err
 		}
@@ -90,7 +100,7 @@ func (q *Queries) GetAllAuctionsByUser(ctx context.Context, sellerID pgtype.UUID
 }
 
 const getAuctionByName = `-- name: GetAuctionByName :one
-SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, seller_id, seller_name, seller_email FROM auction_details
+SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at, seller_id, seller_name, seller_email, category_id, category_name, total_rows FROM auction_details
 WHERE product_name = $1 LIMIT 1
 `
 
@@ -105,19 +115,55 @@ func (q *Queries) GetAuctionByName(ctx context.Context, productName string) (Auc
 		&i.AucStatus,
 		&i.StartingPrice,
 		&i.TargetPrice,
+		&i.CreatedAt,
 		&i.SellerID,
 		&i.SellerName,
 		&i.SellerEmail,
+		&i.CategoryID,
+		&i.CategoryName,
+		&i.TotalRows,
 	)
 	return i, err
 }
 
 const getAuctions = `-- name: GetAuctions :many
-SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, seller_id, seller_name, seller_email FROM auction_details
+SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at, seller_id, seller_name, seller_email, category_id, category_name, total_rows FROM auction_details WHERE
+(($1::text IS NULL OR product_name LIKE '%' || $1::text || '%') OR
+($2::text IS NULL OR product_desc LIKE '%' || $2::text || '%')) AND
+(category_name = $3 OR $3 IS NULL)
+ORDER BY
+    -- Sorting for product_name
+    CASE WHEN $4 = 'product_name' AND NOT $5 THEN product_name END ASC,
+    CASE WHEN $4 = 'product_name' AND $5 THEN product_name END DESC,
+
+    -- Sorting for created_at
+    CASE WHEN $4 = 'created_at' AND NOT $5 THEN created_at END ASC,
+    CASE WHEN $4 = 'created_at' AND $5 THEN created_at END DESC
+LIMIT $7 OFFSET $6
 `
 
-func (q *Queries) GetAuctions(ctx context.Context) ([]AuctionDetail, error) {
-	rows, err := q.db.Query(ctx, getAuctions)
+type GetAuctionsParams struct {
+	ProductName  pgtype.Text `json:"product_name"`
+	ProductDesc  pgtype.Text `json:"product_desc"`
+	CategoryName pgtype.Text `json:"category_name"`
+	OrderBy      interface{} `json:"order_by"`
+	Reverse      interface{} `json:"reverse"`
+	SkippedPages int32       `json:"skipped_pages"`
+	PageSize     int32       `json:"page_size"`
+}
+
+// TODO: Pretty sure there's SQL injection in that LIKE....
+// limit and offset are NOT good for pagination, but let's ignore that for now
+func (q *Queries) GetAuctions(ctx context.Context, arg GetAuctionsParams) ([]AuctionDetail, error) {
+	rows, err := q.db.Query(ctx, getAuctions,
+		arg.ProductName,
+		arg.ProductDesc,
+		arg.CategoryName,
+		arg.OrderBy,
+		arg.Reverse,
+		arg.SkippedPages,
+		arg.PageSize,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -133,9 +179,13 @@ func (q *Queries) GetAuctions(ctx context.Context) ([]AuctionDetail, error) {
 			&i.AucStatus,
 			&i.StartingPrice,
 			&i.TargetPrice,
+			&i.CreatedAt,
 			&i.SellerID,
 			&i.SellerName,
 			&i.SellerEmail,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.TotalRows,
 		); err != nil {
 			return nil, err
 		}

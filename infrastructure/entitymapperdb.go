@@ -47,7 +47,34 @@ func (d *EntityMapperDB) UserToUpdateUserParams(user model.User) db.UpdateUserPa
 
 // Auction
 
-func (d *EntityMapperDB) DBAuctionToAuction(dbAuction db.Auction, seller *model.User) (*model.Auction, error) {
+func (d *EntityMapperDB) AuctionFilterToGetAuctionParams(filter AuctionFilter) (db.GetAuctionsParams, error) {
+	getAuctionParams := db.GetAuctionsParams{
+		Reverse: filter.Reverse,
+		OrderBy: string(filter.OrderBy),
+
+		SkippedPages: int32(filter.SkippedPages),
+		PageSize:     int32(filter.PageSize),
+	}
+
+	getAuctionParams.ProductName = pgtype.Text{
+		String: filter.ProductName,
+		Valid:  filter.ProductName != "",
+	}
+
+	getAuctionParams.ProductDesc = pgtype.Text{
+		String: filter.ProductDesc,
+		Valid:  filter.ProductDesc != "",
+	}
+
+	getAuctionParams.CategoryName = pgtype.Text{
+		String: filter.CategoryName,
+		Valid:  filter.CategoryName != "",
+	}
+
+	return getAuctionParams, nil
+}
+
+func (d *EntityMapperDB) DBAuctionToAuction(dbAuction db.Auction, category *model.Category, seller *model.User) (*model.Auction, error) {
 	dbAuctionStatus, err := d.dbAuctionStatusToAuctionStatus(dbAuction.AucStatus)
 	if err != nil {
 		return nil, err
@@ -80,7 +107,9 @@ func (d *EntityMapperDB) DBAuctionToAuction(dbAuction db.Auction, seller *model.
 		Status:             dbAuctionStatus,
 		StartingPrice:      &dbAuction.StartingPrice,
 		TargetPrice:        targetPrice,
+		CreatedAt:          dbAuction.CreatedAt.Time,
 		Seller:             seller,
+		Category:           category,
 	}
 
 	return auction, nil
@@ -129,6 +158,11 @@ func (d *EntityMapperDB) DBAuctionDetailToAuction(dbAuction db.AuctionDetail) (*
 		Email:    dbAuction.SellerEmail,
 	}
 
+	category := &model.Category{
+		Id:   dbAuction.CategoryID.Bytes,
+		Name: dbAuction.CategoryName,
+	}
+
 	auction := &model.Auction{
 		Id:                 auctionUUID,
 		ProductName:        dbAuction.ProductName,
@@ -136,8 +170,10 @@ func (d *EntityMapperDB) DBAuctionDetailToAuction(dbAuction db.AuctionDetail) (*
 		Mode:               dbAuctionMode,
 		Status:             dbAuctionStatus,
 		StartingPrice:      &dbAuction.StartingPrice,
+		CreatedAt:          dbAuction.CreatedAt.Time,
 		TargetPrice:        targetPrice,
 		Seller:             seller,
+		Category:           category,
 	}
 
 	return auction, nil
@@ -175,6 +211,8 @@ func (d *EntityMapperDB) dbAuctionModeToAuctionMode(aucMode db.AuctionMode) (mod
 
 func (d *EntityMapperDB) auctionStatusToDBAuctionStatus(aucStatus model.AuctionStatus) (db.AuctionStatus, error) {
 	switch aucStatus {
+	case model.AS_Scheduled:
+		return db.AuctionStatusScheduled, nil
 	case model.AS_Ongoing:
 		return db.AuctionStatusOngoing, nil
 	case model.AS_Finished:
@@ -190,6 +228,8 @@ func (d *EntityMapperDB) dbAuctionStatusToAuctionStatus(aucStatus db.AuctionStat
 		return model.AS_Ongoing, nil
 	case db.AuctionStatusFinished:
 		return model.AS_Finished, nil
+	case db.AuctionStatusScheduled:
+		return model.AS_Scheduled, nil
 	default:
 		return model.AS_Ongoing, fmt.Errorf("couldn't convert db AuctionStatus enum to model variant")
 	}
@@ -214,6 +254,12 @@ func (d *EntityMapperDB) AuctionToAddAuctionParams(auction model.Auction) (*db.A
 	}
 
 	pgSellerUUID := d.uuidToDBUuid(auction.Seller.Id)
+	pgCategoryUUID := d.uuidToDBUuid(auction.Category.Id)
+
+	createdAt := pgtype.Timestamp{
+		Time:  auction.CreatedAt,
+		Valid: true,
+	}
 
 	return &db.AddAuctionParams{
 		ProductName:   auction.ProductName,
@@ -223,5 +269,28 @@ func (d *EntityMapperDB) AuctionToAddAuctionParams(auction model.Auction) (*db.A
 		StartingPrice: *auction.StartingPrice,
 		TargetPrice:   dbTargetPrice,
 		SellerID:      pgSellerUUID,
+		CategoryID:    pgCategoryUUID,
+		CreatedAt:     createdAt,
+	}, nil
+}
+
+// Category
+
+func (d *EntityMapperDB) DBCategoriesToCategories(dbCategories []db.Category) ([]model.Category, error) {
+	modelCategories := make([]model.Category, len(dbCategories))
+	for i, dbCategory := range dbCategories {
+		modelCategory, err := d.DBCategoryToCategory(dbCategory)
+		modelCategories[i] = *modelCategory
+		if err != nil {
+			return nil, err
+		}
+	}
+	return modelCategories, nil
+}
+
+func (d *EntityMapperDB) DBCategoryToCategory(dbCategory db.Category) (*model.Category, error) {
+	return &model.Category{
+		Id:   dbCategory.ID.Bytes,
+		Name: dbCategory.CategoryName,
 	}, nil
 }

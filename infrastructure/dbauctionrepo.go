@@ -15,10 +15,16 @@ type DBAuctionRepo struct {
 	mapper  EntityMapperDB
 }
 
-func (r *DBAuctionRepo) GetAuctions(ctx context.Context) ([]model.Auction, error) {
-	dbAuctions, err := r.queries.GetAuctions(ctx)
+func (r *DBAuctionRepo) GetAuctions(ctx context.Context, auctionFilter AuctionFilter) ([]model.Auction, error) {
+	auctionSearchParams, err := r.mapper.AuctionFilterToGetAuctionParams(auctionFilter)
+
 	if err != nil {
-		return nil, &RepositoryError{Message: "if this fails, something broke somewhere"}
+		return nil, &RepositoryError{Message: "Failed to convert auction search parameters to DB struct"}
+	}
+
+	dbAuctions, err := r.queries.GetAuctions(ctx, auctionSearchParams)
+	if err != nil {
+		return nil, &RepositoryError{Message: err.Error()}
 	}
 
 	auctions, err := r.mapper.DBAuctionDetailsToAuctions(dbAuctions)
@@ -74,14 +80,25 @@ func (r *DBAuctionRepo) Add(ctx context.Context, auction model.Auction) (*model.
 				return nil, &sharederrors.DuplicateEntityError{Message: "another auction has that same name"}
 			case "23503":
 				return nil, &ForeignKeyViolationError{Message: "no user found that has the id mentioned as seller_id"}
+			default:
+				return nil, &RepositoryError{Message: "couldn't add auction to db"}
 			}
 		}
 	}
 
-	modelAuction, err := r.mapper.DBAuctionToAuction(dbAuction, auction.Seller)
+	modelAuction, err := r.mapper.DBAuctionToAuction(dbAuction, auction.Category, auction.Seller)
 	if err != nil {
 		return nil, &RepositoryError{Message: "couldn't return added auction"}
 	}
 
 	return modelAuction, nil
+}
+
+func (r *DBAuctionRepo) GetCategories(ctx context.Context) ([]model.Category, error) {
+	dbCategories, err := r.queries.GetCategories(ctx)
+	if err != nil {
+		return nil, &RepositoryError{Message: "Couldn't load categories"}
+	}
+
+	return r.mapper.DBCategoriesToCategories(dbCategories)
 }

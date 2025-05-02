@@ -1,17 +1,51 @@
 package aucbrowse
 
 import "curs1_boilerplate/views/pages"
+import "curs1_boilerplate/model"
+
+templ browseAuctionsFilters(categories []model.Category) {
+<div
+    id="browseAuctionsForm"
+    class="w-75"
+    novalidate
+>   
+    <div class="mb-3">
+        <label for="categorySelect" class="form-label">Category</label>
+        <select form="browseAuctionsForm" class="form-select" id="categorySelect" name="category">
+            <option value="" selected>Any</option>
+            for _, cat := range categories {
+                <option value={cat.Name}>{cat.Name}</option>
+            }
+        </select>
+    </div> 
+
+    <div class="mb-3">
+        <label for="orderBySelect" class="form-label">Order Auctions By</label>
+        <select form="browseAuctionsForm" class="form-select" id="orderBySelect" name="orderBy">
+            <option value="Product Name">Product Name</option>
+            <option value="Created At">Creation Date</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="orderSelect">Order Auctions In</label>
+        <select form="browseAuctionsForm" class="form-select" id="orderSelect" name="reverse">
+            <option value="false">Ascending Order</option>
+            <option value="true">Descending Order</option>
+        </select>
+    </div>
+</div>
+}
 
 templ browseAuctionsContent(viewModel *ViewModel) {
     <div class="d-flex h-100">
-        <div class="flex-basis-20 bg-dark-subtle" id="filterContainer">
-            <p class="text-center">Imagine the filters here</p>
+        <div class="d-flex flex-column align-items-center flex-basis-20 bg-dark-subtle" id="filterContainer">
+            <p class="fs-2 text-center">Filters</p>
+            @browseAuctionsFilters(viewModel.categories)
         </div>
 
         <div class="d-flex flex-column flex-basis-80 align-items-center row-gap-3" id="auctionsList">
-            for _, auction := range viewModel.auctionCards {
-                @auction
-            }
+            @viewModel.auctionList
         </div>
     </div>
 }

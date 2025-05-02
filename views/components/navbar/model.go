@@ -34,8 +34,6 @@ func Make(id string, links []NavLink, searchbar, authButton templ.Component) *Mo
 }
 
 func MakeStandardNavLinks() []NavLink {
-	// TODO: Refactor this out of here... somewhere
-
 	navLinks := make([]NavLink, 0)
 	navLinks = append(navLinks, NavLink{LinkText: "Home", LinkDestination: "/"})
 	navLinks = append(navLinks, NavLink{LinkText: "About Us", LinkDestination: "#"})
@@ -44,10 +42,8 @@ func MakeStandardNavLinks() []NavLink {
 	return navLinks
 }
 
-// TODO: Replace context with profile info, maybe
-func MakeStandardNavbar(ctx context.Context) *Model {
+func MakeStandardNavbarCustomSearch(ctx context.Context, searchbar searchbar.Model) *Model {
 	navLinks := MakeStandardNavLinks()
-	navSearch := searchbar.Make("nav-search", "Search for auctions", "Search auctions")
 
 	userEmail := middleware.GetUserEmailFromContext(ctx)
 
@@ -62,7 +58,13 @@ func MakeStandardNavbar(ctx context.Context) *Model {
 		navbarAuthComp = buttongroup.Make("nav-auth", "Login/Register Buttons", []templ.Component{loginButton, registerButton})
 	}
 
-	return Make("main-nav", navLinks, navSearch, navbarAuthComp)
+	return Make("main-nav", navLinks, &searchbar, navbarAuthComp)
+}
+
+// TODO: Replace context with profile info, maybe
+func MakeStandardNavbar(ctx context.Context) *Model {
+	navSearch := searchbar.Make("nav-search", "Search for auctions", "Search auctions")
+	return MakeStandardNavbarCustomSearch(ctx, *navSearch)
 }
 
 func (m *Model) Render(ctx context.Context, w io.Writer) error {

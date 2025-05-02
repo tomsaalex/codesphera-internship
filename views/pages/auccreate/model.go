@@ -2,6 +2,7 @@ package auccreate
 
 import (
 	"context"
+	"curs1_boilerplate/model"
 	"curs1_boilerplate/views/components/navbar"
 	"io"
 )
@@ -9,6 +10,7 @@ import (
 type AuctionCreateFormErrors struct {
 	ProductNameError   string
 	ProductDescError   string
+	CategoryError      string
 	StatusError        string
 	ModeError          string
 	StartingPriceError string
@@ -19,6 +21,7 @@ type AuctionCreateFormErrors struct {
 type ViewModel struct {
 	productNameHasError   bool
 	productDescHasError   bool
+	categoryHasError      bool
 	statusHasError        bool
 	modeHasError          bool
 	startingPriceHasError bool
@@ -27,6 +30,7 @@ type ViewModel struct {
 
 	productNameError   string
 	productDescError   string
+	categoryError      string
 	statusError        string
 	modeError          string
 	startingPriceError string
@@ -38,6 +42,7 @@ type ViewModel struct {
 	startingPriceCSSClasses map[string]bool
 	targetPriceCSSClasses   map[string]bool
 
+	categories         []model.Category
 	displayTargetPrice bool
 	navbar             *navbar.Model
 }
@@ -51,9 +56,10 @@ func makeInputClasses(hasError bool) map[string]bool {
 	}
 }
 
-func MakeErroredAuctionCreationPage(auctionCreateFormErrs *AuctionCreateFormErrors, displayTargetPrice bool, navbar *navbar.Model) *ViewModel {
+func MakeErroredAuctionCreationPage(auctionCreateFormErrs *AuctionCreateFormErrors, displayTargetPrice bool, categories []model.Category, navbar *navbar.Model) *ViewModel {
 	productNameHasError := auctionCreateFormErrs.ProductNameError != ""
 	productDescHasError := auctionCreateFormErrs.ProductDescError != ""
+	categoryHasError := auctionCreateFormErrs.CategoryError != ""
 	statusHasError := auctionCreateFormErrs.StatusError != ""
 	modeHasError := auctionCreateFormErrs.ModeError != ""
 	startingPriceHasError := auctionCreateFormErrs.StartingPriceError != ""
@@ -63,6 +69,7 @@ func MakeErroredAuctionCreationPage(auctionCreateFormErrs *AuctionCreateFormErro
 	return &ViewModel{
 		productNameHasError:   productNameHasError,
 		productDescHasError:   productDescHasError,
+		categoryHasError:      categoryHasError,
 		statusHasError:        statusHasError,
 		modeHasError:          modeHasError,
 		startingPriceHasError: startingPriceHasError,
@@ -71,6 +78,7 @@ func MakeErroredAuctionCreationPage(auctionCreateFormErrs *AuctionCreateFormErro
 
 		productNameError:   auctionCreateFormErrs.ProductNameError,
 		productDescError:   auctionCreateFormErrs.ProductDescError,
+		categoryError:      auctionCreateFormErrs.CategoryError,
 		statusError:        auctionCreateFormErrs.StatusError,
 		modeError:          auctionCreateFormErrs.ModeError,
 		startingPriceError: auctionCreateFormErrs.StartingPriceError,
@@ -82,15 +90,16 @@ func MakeErroredAuctionCreationPage(auctionCreateFormErrs *AuctionCreateFormErro
 		startingPriceCSSClasses: makeInputClasses(startingPriceHasError),
 		targetPriceCSSClasses:   makeInputClasses(targetPriceHasError),
 
+		categories:         categories,
 		displayTargetPrice: displayTargetPrice,
 		navbar:             navbar,
 	}
 }
 
-func MakeValidAuctionCreationPage(displayTargetPrice bool, navbar *navbar.Model) *ViewModel {
+func MakeValidAuctionCreationPage(displayTargetPrice bool, categories []model.Category, navbar *navbar.Model) *ViewModel {
 	formErrs := &AuctionCreateFormErrors{}
 
-	return MakeErroredAuctionCreationPage(formErrs, displayTargetPrice, navbar)
+	return MakeErroredAuctionCreationPage(formErrs, displayTargetPrice, categories, navbar)
 }
 
 func (vm *ViewModel) Render(ctx context.Context, w io.Writer) error {

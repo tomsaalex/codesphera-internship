@@ -29,51 +29,46 @@ func component(m *Model) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form hx-post=\"/auction-page/1\" hx-ext=\"form-json\" hx-swap=\"innerHTML\" hx-target=\"#auctionsList\" hx-trigger=\"keyup changed delay:300ms from:#searchInput\" id=\"browseAuctionsForm\" role=\"search\" class=\"w-75 input-group flex-nowrap\" style=\"height:3rem\"><span class=\"input-group-text\"><i class=\"bi bi-search\"></i></span> <input id=\"searchInput\" form=\"browseAuctionsForm\" type=\"text\" class=\"form-control\" name=\"productQuery\" placeholder=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(m.id)
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(m.placeholder)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/searchbar/component.templ`, Line: 4, Col: 18}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/searchbar/component.templ`, Line: 12, Col: 138}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" role=\"search\" class=\"w-75 input-group flex-nowrap\" style=\"height:3rem\"><span class=\"input-group-text\"><i class=\"bi bi-search\"></i></span> <input type=\"text\" class=\"form-control\" placeholder=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" aria-label=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(m.placeholder)
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(m.label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/searchbar/component.templ`, Line: 6, Col: 74}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/searchbar/component.templ`, Line: 12, Col: 159}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" aria-label=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(m.label)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/searchbar/component.templ`, Line: 6, Col: 95}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" aria-describedby=\"addon-wrapping\"> <button class=\"btn btn-outline-secondary\" type=\"button\" id=\"button-addon2\">Search</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" aria-describedby=\"addon-wrapping\"> <button class=\"btn btn-outline-secondary\" type=\"submit\" id=\"search-button\">Search</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		return nil
 	})
 }
+
+/*
+<div id={m.id} role="search" class="w-75 input-group flex-nowrap" style="height:3rem">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input hx-get="/search-auctions" hx-trigger="click from:#search-button" hx-ext="form-json" hx-swap="none" type="text" class="form-control" name="productQuery" placeholder={m.placeholder} aria-label={m.label} aria-describedby="addon-wrapping">
+        <button class="btn btn-outline-secondary" type="submit" id="search-button">Search</button>
+    </div>
+*/
 
 var _ = templruntime.GeneratedTemplate

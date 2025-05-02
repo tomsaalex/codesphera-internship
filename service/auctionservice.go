@@ -6,20 +6,32 @@ import (
 	"curs1_boilerplate/middleware"
 	"curs1_boilerplate/model"
 	"curs1_boilerplate/sharederrors"
+	"log"
+	"time"
 )
 
 type AuctionService struct {
 	auctionRepo infrastructure.AuctionRepository
 	userRepo    infrastructure.UserRepository
 	dtoMapper   ServiceDTOMapper
+
+	auctionCategories []model.Category
 }
 
 func NewAuctionService(auctionRepo infrastructure.AuctionRepository, userRepo infrastructure.UserRepository, dtoMapper ServiceDTOMapper) *AuctionService {
-	return &AuctionService{
+	service := &AuctionService{
 		auctionRepo: auctionRepo,
 		userRepo:    userRepo,
 		dtoMapper:   dtoMapper,
 	}
+
+	categories, err := service.refreshCategories()
+	if err != nil {
+		log.Fatal("Couldn't load categories from database")
+	}
+
+	service.auctionCategories = categories
+	return service
 }
 
 func (s *AuctionService) sanitizeAuctionDTO(auctionDTO AuctionDTO) AuctionDTO {
@@ -42,6 +54,10 @@ func (s *AuctionService) validateAuctionDTO(auctionDTO AuctionDTO) error {
 	if auctionDTO.ProductDesc == "" {
 		ve.fieldErrors["productDesc"] = EMPTY
 		validationSuccessful = false
+	}
+
+	if auctionDTO.Category == "" {
+		ve.fieldErrors["category"] = EMPTY
 	}
 
 	if auctionDTO.Mode == "" {
@@ -80,6 +96,7 @@ func (s *AuctionService) validateAuctionDTO(auctionDTO AuctionDTO) error {
 			validationSuccessful = false
 		}
 	}
+
 	if validationSuccessful {
 		return nil
 	}
@@ -107,16 +124,26 @@ func (s *AuctionService) AddAuction(ctx context.Context, auctionDTO AuctionDTO) 
 		return nil, err
 	}
 
-	newAuction, err := s.dtoMapper.AuctionDTOToAuction(auctionDTO, auctionSeller)
+	newAuction, err := s.dtoMapper.AuctionDTOToAuction(auctionDTO, auctionSeller, s.auctionCategories)
 
 	if err != nil {
 		// TODO: Make this nicer. Wrap the underlying error maybe (which in itself should be nicer).
 		return nil, &ServiceError{Message: "auction fields are invalid"}
 	}
+
+	newAuction.CreatedAt = time.Now()
 	savedAuction, err := s.auctionRepo.Add(ctx, *newAuction)
 	return savedAuction, err
 }
 
-func (s *AuctionService) GetAuctions(ctx context.Context) ([]model.Auction, error) {
-	return s.auctionRepo.GetAuctions(ctx)
+func (s *AuctionService) GetAuctions(ctx context.Context, auctionFilter infrastructure.AuctionFilter) ([]model.Auction, error) {
+	return s.auctionRepo.GetAuctions(ctx, auctionFilter)
+}
+
+func (s *AuctionService) refreshCategories() ([]model.Category, error) {
+	return s.auctionRepo.GetCategories(context.Background())
+}
+
+func (s *AuctionService) GetCachedCategories() []model.Category {
+	return s.auctionCategories
 }
