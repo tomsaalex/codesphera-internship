@@ -15,24 +15,24 @@ type DBAuctionRepo struct {
 	mapper  EntityMapperDB
 }
 
-func (r *DBAuctionRepo) GetAuctions(ctx context.Context, auctionFilter AuctionFilter) ([]model.Auction, error) {
+func (r *DBAuctionRepo) GetAuctions(ctx context.Context, auctionFilter AuctionFilter) ([]model.Auction, int, error) {
 	auctionSearchParams, err := r.mapper.AuctionFilterToGetAuctionParams(auctionFilter)
 
 	if err != nil {
-		return nil, &RepositoryError{Message: "Failed to convert auction search parameters to DB struct"}
+		return nil, 0, &RepositoryError{Message: "Failed to convert auction search parameters to DB struct"}
 	}
 
 	dbAuctions, err := r.queries.GetAuctions(ctx, auctionSearchParams)
 	if err != nil {
-		return nil, &RepositoryError{Message: err.Error()}
+		return nil, 0, &RepositoryError{Message: err.Error()}
 	}
 
-	auctions, err := r.mapper.DBAuctionDetailsToAuctions(dbAuctions)
+	auctions, totalMatchingAuctions, err := r.mapper.DBAuctionDetailsToAuctions(dbAuctions)
 	if err != nil {
-		return nil, &RepositoryError{Message: "Couldn't map db auctions to domain auctions"}
+		return nil, 0, &RepositoryError{Message: "Couldn't map db auctions to domain auctions"}
 	}
 
-	return auctions, nil
+	return auctions, totalMatchingAuctions, nil
 }
 
 func (r *DBAuctionRepo) GetAllAuctionsByUser(ctx context.Context, seller model.User) ([]model.Auction, error) {
@@ -42,7 +42,7 @@ func (r *DBAuctionRepo) GetAllAuctionsByUser(ctx context.Context, seller model.U
 		return nil, &RepositoryError{Message: "database couldn't retrieve auctions"}
 	}
 
-	auctions, err := r.mapper.DBAuctionDetailsToAuctions(dbAuctions)
+	auctions, _, err := r.mapper.DBAuctionDetailsToAuctions(dbAuctions)
 	if err != nil {
 		return nil, &RepositoryError{Message: "entity couldn't be mapped to DB model"}
 	}

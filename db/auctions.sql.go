@@ -130,7 +130,7 @@ const getAuctions = `-- name: GetAuctions :many
 SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at, seller_id, seller_name, seller_email, category_id, category_name, total_rows FROM auction_details WHERE
 (($1::text IS NULL OR product_name LIKE '%' || $1::text || '%') OR
 ($2::text IS NULL OR product_desc LIKE '%' || $2::text || '%')) AND
-(category_name = $3 OR $3 IS NULL)
+(category_name = $3::text OR $3 IS NULL)
 ORDER BY
     -- Sorting for product_name
     CASE WHEN $4 = 'product_name' AND NOT $5 THEN product_name END ASC,
@@ -148,7 +148,7 @@ type GetAuctionsParams struct {
 	CategoryName pgtype.Text `json:"category_name"`
 	OrderBy      interface{} `json:"order_by"`
 	Reverse      interface{} `json:"reverse"`
-	SkippedPages int32       `json:"skipped_pages"`
+	SkippedItems int32       `json:"skipped_items"`
 	PageSize     int32       `json:"page_size"`
 }
 
@@ -161,7 +161,7 @@ func (q *Queries) GetAuctions(ctx context.Context, arg GetAuctionsParams) ([]Auc
 		arg.CategoryName,
 		arg.OrderBy,
 		arg.Reverse,
-		arg.SkippedPages,
+		arg.SkippedItems,
 		arg.PageSize,
 	)
 	if err != nil {

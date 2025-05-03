@@ -61,7 +61,8 @@ func (rc *AuctionRestController) searchAuctionsList(w http.ResponseWriter, r *ht
 	if selectedPage == "" {
 		skippedPages = 0
 	} else {
-		skippedPages, err := strconv.Atoi(selectedPage)
+		var err error
+		skippedPages, err = strconv.Atoi(selectedPage)
 		if err != nil {
 			// TODO: Error Message
 		}
@@ -85,8 +86,10 @@ func (rc *AuctionRestController) searchAuctionsList(w http.ResponseWriter, r *ht
 		}
 	}
 
+	auctionSearchParams.SkippedPages = skippedPages
+
 	auctionFilter := auctionSearchParams.ToServiceStruct()
-	auctions, err := rc.auctionService.GetAuctions(r.Context(), *auctionFilter)
+	auctions, _, err := rc.auctionService.GetAuctions(r.Context(), *auctionFilter)
 	if err != nil {
 		// TODO: Replace with a proper error message on the page
 	}
@@ -95,24 +98,6 @@ func (rc *AuctionRestController) searchAuctionsList(w http.ResponseWriter, r *ht
 }
 
 func (rc *AuctionRestController) searchAuctions(w http.ResponseWriter, r *http.Request) {
-	/*var auctionSearchParams AuctionSearchParams
-	err := json.NewDecoder(r.Body).Decode(&auctionSearchParams)
-
-	if err != nil {
-		auctionSearchParams = AuctionSearchParams{
-			ProductQuery: "",
-			CategoryName: "",
-
-			Reverse: true,
-			OrderBy: "created_at",
-
-			SkippedPages: 0,
-			PageSize:     5,
-		}
-	}
-
-	auctionFilter := auctionSearchParams.ToServiceStruct()
-	*/
 	productQuery := r.URL.Query().Get("productQuery")
 
 	auctionSearchParams := AuctionSearchParams{
@@ -128,16 +113,17 @@ func (rc *AuctionRestController) searchAuctions(w http.ResponseWriter, r *http.R
 
 	auctionFilter := auctionSearchParams.ToServiceStruct()
 
-	auctions, err := rc.auctionService.GetAuctions(r.Context(), *auctionFilter)
+	auctions, totalMatchingAuctions, err := rc.auctionService.GetAuctions(r.Context(), *auctionFilter)
 	if err != nil {
 		// TODO: Replace with a proper error message on the page
 	}
 
 	categories := rc.auctionService.GetCachedCategories()
-	searchbar := searchbar.MakeWithValue("nav-search", "Search for auctions", "Search auctions", productQuery)
+	searchbar := searchbar.MakeWithValue("nav-search", "Search for auctions", "Search auctions", "browsePage", productQuery)
 	navbar := navbar.MakeStandardNavbarCustomSearch(r.Context(), *searchbar)
 
-	auctionsList := auclist.MakeStandardAuctionList(auctions, *pagenav.MakePageNav(4, 1))
+	totalPageCount := (totalMatchingAuctions + auctionFilter.PageSize - 1) / auctionFilter.PageSize
+	auctionsList := auclist.MakeStandardAuctionList(auctions, *pagenav.MakePageNav(totalPageCount, 1))
 	browseAuctionsPage := aucbrowse.MakeAuctionBrowsePage(*auctionsList, categories, navbar)
 	base.PageSkeleton(browseAuctionsPage).Render(r.Context(), w)
 }

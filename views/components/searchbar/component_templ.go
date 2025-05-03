@@ -29,46 +29,66 @@ func component(m *Model) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form hx-post=\"/auction-page/1\" hx-ext=\"form-json\" hx-swap=\"innerHTML\" hx-target=\"#auctionsList\" hx-trigger=\"keyup changed delay:300ms from:#searchInput\" id=\"browseAuctionsForm\" role=\"search\" class=\"w-75 input-group flex-nowrap\" style=\"height:3rem\"><span class=\"input-group-text\"><i class=\"bi bi-search\"></i></span> <input id=\"searchInput\" form=\"browseAuctionsForm\" type=\"text\" class=\"form-control\" name=\"productQuery\" placeholder=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if m.searchBarLocation == "browsePage" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " hx-post=\"/auction-page/1\" hx-ext=\"form-json\" hx-swap=\"innerHTML\" hx-target=\"#auctionsList\" hx-trigger=\"keyup changed delay:300ms from:#searchInput, change delay:300ms from:#categorySelect, change delay:300ms from:#orderBySelect, change delay:300ms from:#orderSelect\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " action=\"/search-auctions\" form-method=\"GET\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " id=\"browseAuctionsForm\" role=\"search\" class=\"w-75 input-group flex-nowrap\" style=\"height:3rem\"><span class=\"input-group-text\"><i class=\"bi bi-search\"></i></span> <input id=\"searchInput\" type=\"text\" class=\"form-control\" name=\"productQuery\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(m.placeholder)
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(m.initialText)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/searchbar/component.templ`, Line: 12, Col: 138}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/searchbar/component.templ`, Line: 20, Col: 105}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" aria-label=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" placeholder=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(m.label)
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(m.placeholder)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/searchbar/component.templ`, Line: 12, Col: 159}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/searchbar/component.templ`, Line: 20, Col: 133}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" aria-describedby=\"addon-wrapping\"> <button class=\"btn btn-outline-secondary\" type=\"submit\" id=\"search-button\">Search</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" aria-label=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(m.label)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/searchbar/component.templ`, Line: 20, Col: 154}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" aria-describedby=\"addon-wrapping\"> <button class=\"btn btn-outline-secondary\" type=\"submit\" id=\"search-button\">Search</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		return nil
 	})
 }
-
-/*
-<div id={m.id} role="search" class="w-75 input-group flex-nowrap" style="height:3rem">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input hx-get="/search-auctions" hx-trigger="click from:#search-button" hx-ext="form-json" hx-swap="none" type="text" class="form-control" name="productQuery" placeholder={m.placeholder} aria-label={m.label} aria-describedby="addon-wrapping">
-        <button class="btn btn-outline-secondary" type="submit" id="search-button">Search</button>
-    </div>
-*/
 
 var _ = templruntime.GeneratedTemplate

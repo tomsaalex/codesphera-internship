@@ -22,6 +22,7 @@ templ AuctionCard(model *Model) {
                 <p class="fs-1">{model.auction.ProductName}</p>
                 <hr class="my-1">
                 <p class="fs-4">{model.auction.ProductDescription}</p>
+                <p>{model.auction.Category.Name}</p>
             </div>
         </div>
     </div>

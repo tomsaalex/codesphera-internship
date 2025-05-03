@@ -136,7 +136,7 @@ func (s *AuctionService) AddAuction(ctx context.Context, auctionDTO AuctionDTO) 
 	return savedAuction, err
 }
 
-func (s *AuctionService) GetAuctions(ctx context.Context, auctionFilter infrastructure.AuctionFilter) ([]model.Auction, error) {
+func (s *AuctionService) GetAuctions(ctx context.Context, auctionFilter infrastructure.AuctionFilter) ([]model.Auction, int, error) {
 	return s.auctionRepo.GetAuctions(ctx, auctionFilter)
 }
 

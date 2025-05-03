@@ -13,13 +13,16 @@ type pageLink struct {
 }
 
 func (l *pageLink) GetLink() string {
-	return fmt.Sprintf("/whatever/%s", l.pageNum)
+	return fmt.Sprintf("/auction-page/%s", l.pageNum)
 }
 
 type ViewModel struct {
 	pageCount    int
 	selectedPage int
 	pages        []pageLink
+
+	firstPageLink pageLink
+	lastPageLink  pageLink
 }
 
 func generatePageLinks(pageCount, selectedPage int) []pageLink {
@@ -59,10 +62,16 @@ func generatePageLinks(pageCount, selectedPage int) []pageLink {
 func MakePageNav(pageCount, selectedPage int) *ViewModel {
 	pagesToDisplay := generatePageLinks(pageCount, selectedPage)
 
+	firstPageLink := pageLink{pageNum: "1", isSelected: false}
+	lastPageLink := pageLink{pageNum: strconv.Itoa(pageCount), isSelected: false}
+
 	return &ViewModel{
 		pageCount:    pageCount,
 		pages:        pagesToDisplay,
 		selectedPage: selectedPage,
+
+		firstPageLink: firstPageLink,
+		lastPageLink:  lastPageLink,
 	}
 }
 

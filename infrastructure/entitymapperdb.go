@@ -52,7 +52,7 @@ func (d *EntityMapperDB) AuctionFilterToGetAuctionParams(filter AuctionFilter) (
 		Reverse: filter.Reverse,
 		OrderBy: string(filter.OrderBy),
 
-		SkippedPages: int32(filter.SkippedPages),
+		SkippedItems: int32(filter.PageSize) * int32(filter.SkippedPages),
 		PageSize:     int32(filter.PageSize),
 	}
 
@@ -115,16 +115,22 @@ func (d *EntityMapperDB) DBAuctionToAuction(dbAuction db.Auction, category *mode
 	return auction, nil
 }
 
-func (d *EntityMapperDB) DBAuctionDetailsToAuctions(dbAuctions []db.AuctionDetail) ([]model.Auction, error) {
+func (d *EntityMapperDB) DBAuctionDetailsToAuctions(dbAuctions []db.AuctionDetail) ([]model.Auction, int, error) {
 	modelAuctions := make([]model.Auction, len(dbAuctions))
+
+	totalMatchingAuctions := 0
+	if len(dbAuctions) > 0 {
+		totalMatchingAuctions = int(dbAuctions[0].TotalRows)
+	}
+
 	for i, dbAuction := range dbAuctions {
 		modelAuction, err := d.DBAuctionDetailToAuction(dbAuction)
 		modelAuctions[i] = *modelAuction
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 	}
-	return modelAuctions, nil
+	return modelAuctions, totalMatchingAuctions, nil
 }
 
 func (d *EntityMapperDB) DBAuctionDetailToAuction(dbAuction db.AuctionDetail) (*model.Auction, error) {

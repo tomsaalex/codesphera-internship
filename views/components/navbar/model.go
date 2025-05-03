@@ -63,7 +63,7 @@ func MakeStandardNavbarCustomSearch(ctx context.Context, searchbar searchbar.Mod
 
 // TODO: Replace context with profile info, maybe
 func MakeStandardNavbar(ctx context.Context) *Model {
-	navSearch := searchbar.Make("nav-search", "Search for auctions", "Search auctions")
+	navSearch := searchbar.Make("nav-search", "Search for auctions", "Search auctions", "home")
 	return MakeStandardNavbarCustomSearch(ctx, *navSearch)
 }
 

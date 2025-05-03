@@ -32,7 +32,7 @@ func browseAuctionsFilters(categories []model.Category) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"browseAuctionsForm\" class=\"w-75\" novalidate><div class=\"mb-3\"><label for=\"categorySelect\" class=\"form-label\">Category</label> <select form=\"browseAuctionsForm\" class=\"form-select\" id=\"categorySelect\" name=\"category\"><option value=\"\" selected>Any</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"w-75\" novalidate><div class=\"mb-3\"><label for=\"categorySelect\" class=\"form-label\">Category</label> <select form=\"browseAuctionsForm\" class=\"form-select\" id=\"categorySelect\" name=\"categoryName\"><option value=\"\" selected>Any</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -44,7 +44,7 @@ func browseAuctionsFilters(categories []model.Category) templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(cat.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/aucbrowse/browseauctions.templ`, Line: 17, Col: 39}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/aucbrowse/browseauctions.templ`, Line: 16, Col: 39}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -57,7 +57,7 @@ func browseAuctionsFilters(categories []model.Category) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(cat.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/aucbrowse/browseauctions.templ`, Line: 17, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/aucbrowse/browseauctions.templ`, Line: 16, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -68,7 +68,7 @@ func browseAuctionsFilters(categories []model.Category) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</select></div><div class=\"mb-3\"><label for=\"orderBySelect\" class=\"form-label\">Order Auctions By</label> <select form=\"browseAuctionsForm\" class=\"form-select\" id=\"orderBySelect\" name=\"orderBy\"><option value=\"Product Name\">Product Name</option> <option value=\"Created At\">Creation Date</option></select></div><div class=\"mb-3\"><label for=\"orderSelect\">Order Auctions In</label> <select form=\"browseAuctionsForm\" class=\"form-select\" id=\"orderSelect\" name=\"reverse\"><option value=\"false\">Ascending Order</option> <option value=\"true\">Descending Order</option></select></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</select></div><div class=\"mb-3\"><label for=\"orderBySelect\" class=\"form-label\">Order Auctions By</label> <select form=\"browseAuctionsForm\" class=\"form-select\" id=\"orderBySelect\" name=\"orderBy\"><option value=\"Product Name\">Product Name</option> <option value=\"Created At\" selected>Creation Date</option></select></div><div class=\"mb-3\"><label for=\"orderSelect\">Order Auctions In</label> <select form=\"browseAuctionsForm\" class=\"form-select\" id=\"orderSelect\" name=\"reverse\"><option value=\"false\">Ascending Order</option> <option value=\"true\" selected>Descending Order</option></select></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

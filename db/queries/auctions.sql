@@ -3,7 +3,7 @@ SELECT * FROM auction_details WHERE
 -- TODO: Pretty sure there's SQL injection in that LIKE....
 ((sqlc.narg(product_name)::text IS NULL OR product_name LIKE '%' || sqlc.narg(product_name)::text || '%') OR
 (sqlc.narg(product_desc)::text IS NULL OR product_desc LIKE '%' || sqlc.narg(product_desc)::text || '%')) AND
-(category_name = sqlc.narg(category_name) OR sqlc.narg(category_name) IS NULL)
+(category_name = sqlc.narg(category_name)::text OR sqlc.narg(category_name) IS NULL)
 ORDER BY
     -- Sorting for product_name
     CASE WHEN @order_by = 'product_name' AND NOT @reverse THEN product_name END ASC,
@@ -13,7 +13,7 @@ ORDER BY
     CASE WHEN @order_by = 'created_at' AND NOT @reverse THEN created_at END ASC,
     CASE WHEN @order_by = 'created_at' AND @reverse THEN created_at END DESC
 -- limit and offset are NOT good for pagination, but let's ignore that for now
-LIMIT @page_size OFFSET @skipped_pages;
+LIMIT @page_size OFFSET @skipped_items;
 
 -- name: AddAuction :one
 insert into auctions

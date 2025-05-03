@@ -10,18 +10,21 @@ type Model struct {
 	label       string
 	placeholder string
 	initialText string
+
+	searchBarLocation string
 }
 
-func Make(id, label, placeholder string) *Model {
-	return MakeWithValue(id, label, placeholder, "")
+func Make(id, label, placeholder, searchBarLocation string) *Model {
+	return MakeWithValue(id, label, placeholder, searchBarLocation, "")
 }
 
-func MakeWithValue(id, label, placeholder, initialText string) *Model {
+func MakeWithValue(id, label, placeholder, searchBarLocation, initialText string) *Model {
 	return &Model{
-		id:          id,
-		label:       label,
-		placeholder: placeholder,
-		initialText: initialText,
+		id:                id,
+		label:             label,
+		placeholder:       placeholder,
+		initialText:       initialText,
+		searchBarLocation: searchBarLocation,
 	}
 }
 

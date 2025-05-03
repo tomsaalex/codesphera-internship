@@ -1,23 +1,23 @@
 package searchbar
 
 templ component(m *Model) {
-    /*<form action="/search-auctions" form-method="GET" id={m.id} role="search" class="w-75 input-group flex-nowrap" style="height:3rem">
+    // TODO: This isn't much of a component anymore... too dependent on surroundings. Refactor the form out of here, maybe.
+    // TODO: Don't use a string to determine the type of form.
+    <form 
+    if m.searchBarLocation=="browsePage"{
+        hx-post="/auction-page/1" 
+        hx-ext="form-json" 
+        hx-swap="innerHTML" 
+        hx-target="#auctionsList" 
+        hx-trigger="keyup changed delay:300ms from:#searchInput, change delay:300ms from:#categorySelect, change delay:300ms from:#orderBySelect, change delay:300ms from:#orderSelect" 
+    } else {
+        action="/search-auctions" form-method="GET"
+    }
+        id="browseAuctionsForm" 
+        role="search" 
+        class="w-75 input-group flex-nowrap" style="height:3rem">
         <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input type="text" class="form-control" name="productQuery" placeholder={m.placeholder} value={m.initialText} aria-label={m.label} aria-describedby="addon-wrapping">
-        <button class="btn btn-outline-secondary" type="submit" id="search-button">Search</button>
-    </form>*/
-    // TODO: Replace ID with something from the model
-    <form hx-post="/auction-page/1" hx-ext="form-json" hx-swap="innerHTML" hx-target="#auctionsList" hx-trigger="keyup changed delay:300ms from:#searchInput" id="browseAuctionsForm" role="search" class="w-75 input-group flex-nowrap" style="height:3rem">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input id="searchInput" form="browseAuctionsForm"  type="text" class="form-control" name="productQuery" placeholder={m.placeholder} aria-label={m.label} aria-describedby="addon-wrapping">
+        <input id="searchInput" type="text" class="form-control" name="productQuery" value={m.initialText} placeholder={m.placeholder} aria-label={m.label} aria-describedby="addon-wrapping">
         <button class="btn btn-outline-secondary" type="submit" id="search-button">Search</button>
     </form>
 }
-
-/*
-<div id={m.id} role="search" class="w-75 input-group flex-nowrap" style="height:3rem">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input hx-get="/search-auctions" hx-trigger="click from:#search-button" hx-ext="form-json" hx-swap="none" type="text" class="form-control" name="productQuery" placeholder={m.placeholder} aria-label={m.label} aria-describedby="addon-wrapping">
-        <button class="btn btn-outline-secondary" type="submit" id="search-button">Search</button>
-    </div>
-    */
