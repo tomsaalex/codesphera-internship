@@ -44,7 +44,11 @@ templ browseAuctionsContent(viewModel *ViewModel) {
         </div>
 
         <div class="d-flex flex-column flex-basis-80 align-items-center row-gap-3" id="auctionsList">
-            @viewModel.auctionList
+            if viewModel.alert != nil {
+                @viewModel.alert
+            } else {
+                @viewModel.auctionList
+            }
         </div>
     </div>
 }

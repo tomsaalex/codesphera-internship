@@ -1,0 +1,7 @@
+package custalerts
+
+templ customAlert(vm *ViewModel) {
+    <div class={"alert", string(vm.alertType)} role="alert">
+        {vm.alertMsg}
+    </div>
+}

@@ -7,6 +7,7 @@ import (
 	"curs1_boilerplate/sharederrors"
 	"curs1_boilerplate/util"
 	"curs1_boilerplate/views/base"
+	custalerts "curs1_boilerplate/views/components/alert"
 	"curs1_boilerplate/views/components/auclist"
 	"curs1_boilerplate/views/components/navbar"
 	"curs1_boilerplate/views/components/pagenav"
@@ -47,13 +48,6 @@ func (rc *AuctionRestController) createAuctionPage(w http.ResponseWriter, r *htt
 	base.PageSkeleton(createAuctionPage).Render(r.Context(), w)
 }
 
-/*
-func (rc *AuctionRestController) searchAuctionsTest(w http.ResponseWriter, r *http.Request) {
-	productQuery := r.URL.Query().Get("productQuery")
-	pathToRedir := fmt.Sprintf("{\"path\":\"/search-auctions/?productQuery=%s\"}", productQuery)
-	w.Header().Set("HX-Location", pathToRedir)
-}*/
-
 func (rc *AuctionRestController) searchAuctionsList(w http.ResponseWriter, r *http.Request) {
 	selectedPage := chi.URLParam(r, "pageNum")
 
@@ -64,7 +58,8 @@ func (rc *AuctionRestController) searchAuctionsList(w http.ResponseWriter, r *ht
 		var err error
 		skippedPages, err = strconv.Atoi(selectedPage)
 		if err != nil {
-			// TODO: Error Message
+			custalerts.MakeAlertDanger("You requested an invalid page, and so it could not be served.").Render(r.Context(), w)
+			return
 		}
 
 		skippedPages--
@@ -91,7 +86,8 @@ func (rc *AuctionRestController) searchAuctionsList(w http.ResponseWriter, r *ht
 	auctionFilter := auctionSearchParams.ToServiceStruct()
 	auctions, _, err := rc.auctionService.GetAuctions(r.Context(), *auctionFilter)
 	if err != nil {
-		// TODO: Replace with a proper error message on the page
+		custalerts.MakeAlertDanger("Couldn't retrieve auctions. Try again later!").Render(r.Context(), w)
+		return
 	}
 
 	auclist.MakeStandardAuctionList(auctions, *pagenav.MakePageNav(4, skippedPages+1)).Render(r.Context(), w)
@@ -113,18 +109,22 @@ func (rc *AuctionRestController) searchAuctions(w http.ResponseWriter, r *http.R
 
 	auctionFilter := auctionSearchParams.ToServiceStruct()
 
-	auctions, totalMatchingAuctions, err := rc.auctionService.GetAuctions(r.Context(), *auctionFilter)
-	if err != nil {
-		// TODO: Replace with a proper error message on the page
-	}
-
 	categories := rc.auctionService.GetCachedCategories()
 	searchbar := searchbar.MakeWithValue("nav-search", "Search for auctions", "Search auctions", "browsePage", productQuery)
 	navbar := navbar.MakeStandardNavbarCustomSearch(r.Context(), *searchbar)
 
+	auctions, totalMatchingAuctions, err := rc.auctionService.GetAuctions(r.Context(), *auctionFilter)
+
+	if err != nil {
+		dangerAlert := custalerts.MakeAlertDanger("Couldn't retrieve auctions. Try again later!")
+		browseAuctionsPage := aucbrowse.MakeAuctionBrowsePage(nil, categories, navbar, dangerAlert)
+		base.PageSkeleton(browseAuctionsPage).Render(r.Context(), w)
+		return
+	}
+
 	totalPageCount := (totalMatchingAuctions + auctionFilter.PageSize - 1) / auctionFilter.PageSize
 	auctionsList := auclist.MakeStandardAuctionList(auctions, *pagenav.MakePageNav(totalPageCount, 1))
-	browseAuctionsPage := aucbrowse.MakeAuctionBrowsePage(*auctionsList, categories, navbar)
+	browseAuctionsPage := aucbrowse.MakeAuctionBrowsePage(auctionsList, categories, navbar, nil)
 	base.PageSkeleton(browseAuctionsPage).Render(r.Context(), w)
 }
 
