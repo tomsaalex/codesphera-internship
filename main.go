@@ -9,12 +9,17 @@ import (
 	"curs1_boilerplate/util"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 )
 
 func main() {
+	// set up logger
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+
 	// connect to the db
 	pool := db.NewConnectionPool()
 	queries := db.New(pool)
@@ -39,6 +44,7 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(middleware.AttachUser(*jwtHelper))
+	r.Use(middleware.LoggingMiddleware)
 
 	userRestController.SetupRoutes(r)
 	generalRestController.SetupRoutes(r)

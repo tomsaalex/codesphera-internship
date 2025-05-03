@@ -16,6 +16,7 @@ import (
 	"curs1_boilerplate/views/pages/auccreate"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -42,6 +43,10 @@ func (rc *AuctionRestController) SetupRoutes(r chi.Router) {
 }
 
 func (rc *AuctionRestController) createAuctionPage(w http.ResponseWriter, r *http.Request) {
+	logger := middleware.LoggerFromContext(r.Context()).With(slog.String("Layer", "AuctionRestController"))
+
+	logger.Info("Rendering Auction Creation Page")
+
 	categories := rc.auctionService.GetCachedCategories()
 	createAuctionPage := auccreate.MakeValidAuctionCreationPage(false, categories, navbar.MakeStandardNavbar(r.Context()))
 
@@ -94,6 +99,8 @@ func (rc *AuctionRestController) searchAuctionsList(w http.ResponseWriter, r *ht
 }
 
 func (rc *AuctionRestController) searchAuctions(w http.ResponseWriter, r *http.Request) {
+	logger := middleware.LoggerFromContext(r.Context()).With(slog.String("Layer", "AuctionRestController"))
+	logger.Info("Rendering Auction Browsing Page")
 	productQuery := r.URL.Query().Get("productQuery")
 
 	auctionSearchParams := AuctionSearchParams{
@@ -116,11 +123,14 @@ func (rc *AuctionRestController) searchAuctions(w http.ResponseWriter, r *http.R
 	auctions, totalMatchingAuctions, err := rc.auctionService.GetAuctions(r.Context(), *auctionFilter)
 
 	if err != nil {
+		logger.Error("Fetching auctions failed")
 		dangerAlert := custalerts.MakeAlertDanger("Couldn't retrieve auctions. Try again later!")
 		browseAuctionsPage := aucbrowse.MakeAuctionBrowsePage(nil, categories, navbar, dangerAlert)
 		base.PageSkeleton(browseAuctionsPage).Render(r.Context(), w)
 		return
 	}
+
+	logger.Info("Fetching auctions succeeded")
 
 	totalPageCount := (totalMatchingAuctions + auctionFilter.PageSize - 1) / auctionFilter.PageSize
 	auctionsList := auclist.MakeStandardAuctionList(auctions, *pagenav.MakePageNav(totalPageCount, 1))
@@ -129,12 +139,14 @@ func (rc *AuctionRestController) searchAuctions(w http.ResponseWriter, r *http.R
 }
 
 func (rc *AuctionRestController) addAuction(w http.ResponseWriter, r *http.Request) {
+	logger := middleware.LoggerFromContext(r.Context()).With(slog.String("Layer", "AuctionRestController"))
 	categories := rc.auctionService.GetCachedCategories()
 
 	var auctionDTO service.AuctionDTO
 	err := json.NewDecoder(r.Body).Decode(&auctionDTO)
 	formErrs := auccreate.AuctionCreateFormErrors{}
 	if err != nil {
+		logger.Error("Couldn't parse request body. Add Auction cancelled.")
 		formErrs.GenericError = "Request failed for an unknown reason"
 
 		auctionCreationPage := auccreate.MakeErroredAuctionCreationPage(&formErrs, false, categories, navbar.MakeStandardNavbar(r.Context()))
@@ -159,6 +171,8 @@ func (rc *AuctionRestController) addAuction(w http.ResponseWriter, r *http.Reque
 		var auctionCreationPage *auccreate.ViewModel
 
 		if errors.As(err, &valErr) {
+			logger.Error("Auction is invalid. Addition has been cancelled")
+
 			_, hasProductNameErr := valErr.GetField("productName")
 			_, hasProductDescErr := valErr.GetField("productDesc")
 			_, hasCategoryErr := valErr.GetField("category")
@@ -201,18 +215,25 @@ func (rc *AuctionRestController) addAuction(w http.ResponseWriter, r *http.Reque
 				}
 			}
 		} else if errors.As(err, &duplicateErr) {
+			logger.Error("Auction is duplicated. Addition has been cancelled")
 			formErrs.ProductNameError = "There's already an auction for a product with the same name."
 		} else if errors.As(err, &entityNotFoundErr) {
+			logger.Error("Auction seller couldn't be found. Addition has been cancelled.")
 			formErrs.GenericError = "Couldn't create an auction for the given seller. Seller hasn't been found."
 		} else if errors.As(err, &serviceErr) {
+			logger.Error("Unexpected error occured, but addition likely succeeded.")
 			formErrs.GenericError = "Auction fields are invalid."
 		} else if errors.As(err, &entityDBMappingErr) {
+			logger.Error("Auction is invalid. Addition has been cancelled")
 			formErrs.GenericError = "Auction fields are invalid."
 		} else if errors.As(err, &foreignKeyViolationErr) {
+			logger.Error("Auction violated a foreign key constraint. Addition has been cancelled")
 			formErrs.GenericError = "Couldn't create an auction for the given seller. Seller hasn't been found."
 		} else if errors.As(err, &repositoryErr) {
+			logger.Error("Auction was invalid. It is uncertain whether the addition succeeded or not.")
 			formErrs.GenericError = "Auction fields are invalid."
 		} else {
+			logger.Error("Addition failed for unknown reasons.")
 			formErrs.GenericError = "An unexpected error occurred on our end. Please retry later!"
 		}
 		auctionCreationPage = auccreate.MakeErroredAuctionCreationPage(&formErrs, formHasTargetPrice, categories, navbar.MakeStandardNavbar(r.Context()))
@@ -220,6 +241,7 @@ func (rc *AuctionRestController) addAuction(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	logger.Info("Auction was added successfully")
 	// TODO: Redirect to auction page... after you make it
 	w.Header().Set("HX-Redirect", "/")
 }

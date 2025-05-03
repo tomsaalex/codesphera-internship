@@ -7,6 +7,7 @@ import (
 	"curs1_boilerplate/model"
 	"curs1_boilerplate/sharederrors"
 	"log"
+	"log/slog"
 	"time"
 )
 
@@ -19,6 +20,7 @@ type AuctionService struct {
 }
 
 func NewAuctionService(auctionRepo infrastructure.AuctionRepository, userRepo infrastructure.UserRepository, dtoMapper ServiceDTOMapper) *AuctionService {
+	logger := middleware.LoggerFromContext(context.Background()).With(slog.String("Layer", "NewAuctionService"))
 	service := &AuctionService{
 		auctionRepo: auctionRepo,
 		userRepo:    userRepo,
@@ -31,6 +33,8 @@ func NewAuctionService(auctionRepo infrastructure.AuctionRepository, userRepo in
 	}
 
 	service.auctionCategories = categories
+	logger.Info("Successfully imported Auction categories from the DB")
+
 	return service
 }
 
@@ -105,8 +109,11 @@ func (s *AuctionService) validateAuctionDTO(auctionDTO AuctionDTO) error {
 }
 
 func (s *AuctionService) AddAuction(ctx context.Context, auctionDTO AuctionDTO) (*model.Auction, error) {
+	logger := middleware.LoggerFromContext(ctx).With(slog.String("Layer", "AuctionService"))
+
 	err := s.validateAuctionDTO(auctionDTO)
 	if err != nil {
+		logger.Error("Given Auction is invalid")
 		return nil, err
 	}
 
@@ -115,18 +122,21 @@ func (s *AuctionService) AddAuction(ctx context.Context, auctionDTO AuctionDTO) 
 	_, err = s.auctionRepo.GetAuctionByName(ctx, auctionDTO.ProductName)
 
 	if err == nil {
+		logger.Error("Auction's product name is duplicated")
 		return nil, &sharederrors.DuplicateEntityError{Message: "there's already a product by that name being auctioned"}
 	}
 	sellerEmail := middleware.GetUserEmailFromContext(ctx)
 	auctionSeller, err := s.userRepo.GetUserByEmail(ctx, sellerEmail)
 
 	if err != nil {
+		logger.Error("Auction's seller couldn't be found in the DB")
 		return nil, err
 	}
 
 	newAuction, err := s.dtoMapper.AuctionDTOToAuction(auctionDTO, auctionSeller, s.auctionCategories)
 
 	if err != nil {
+		logger.Warn("Couldn't convert AuctionDTO to Auction.")
 		// TODO: Make this nicer. Wrap the underlying error maybe (which in itself should be nicer).
 		return nil, &ServiceError{Message: "auction fields are invalid"}
 	}

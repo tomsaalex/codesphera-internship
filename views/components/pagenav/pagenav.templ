@@ -5,17 +5,17 @@ templ PaginationNav(vm *ViewModel) {
         <ul class="pagination">
             <li class="page-item">
                 <a hx-post={vm.firstPageLink.GetLink()} hx-swap="innerHTML" hx-target="#auctionsList" class="page-link"  aria-label="First">
-                    <span aria-hidden="true">&laquo;</span>
+                    <span class="user-select-none" aria-hidden="true">&laquo;</span>
                 </a>   
             </li>
 
             for _, pageLink := range vm.pages {
-                <li class="page-item"><a hx-post={pageLink.GetLink()} hx-swap="innerHTML" hx-target="#auctionsList" class={"page-link", templ.KV("active", pageLink.isSelected)}>{pageLink.pageNum}</a></li>    
+                <li class="page-item user-select-none"><a hx-post={pageLink.GetLink()} hx-swap="innerHTML" hx-target="#auctionsList" class={"page-link", templ.KV("active", pageLink.isSelected)}>{pageLink.pageNum}</a></li>    
             }
 
             <li class="page-item">
                 <a hx-post={vm.lastPageLink.GetLink()} hx-swap="innerHTML" hx-target="#auctionsList" class="page-link" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
+                    <span class="user-select-none" aria-hidden="true">&raquo;</span>
                 </a>
             </li>
         </ul>
