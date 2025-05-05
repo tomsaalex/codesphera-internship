@@ -42,7 +42,7 @@ func PaginationNav(vm *ViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-swap=\"innerHTML\" hx-target=\"#auctionsList\" class=\"page-link\" aria-label=\"First\"><span class=\"user-select-none\" aria-hidden=\"true\">&laquo;</span></a></li>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-ext=\"form-json\" hx-include=\"#browseAuctionsForm\" hx-swap=\"innerHTML\" hx-target=\"#auctionsList\" class=\"page-link\" aria-label=\"First\"><span class=\"user-select-none\" aria-hidden=\"true\">&laquo;</span></a></li>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -69,7 +69,7 @@ func PaginationNav(vm *ViewModel) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"innerHTML\" hx-target=\"#auctionsList\" class=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-ext=\"form-json\" hx-include=\"#browseAuctionsForm\" hx-swap=\"innerHTML\" hx-target=\"#auctionsList\" class=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -89,7 +89,7 @@ func PaginationNav(vm *ViewModel) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(pageLink.pageNum)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/pagenav/pagenav.templ`, Line: 13, Col: 211}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/components/pagenav/pagenav.templ`, Line: 13, Col: 263}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -113,7 +113,7 @@ func PaginationNav(vm *ViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-swap=\"innerHTML\" hx-target=\"#auctionsList\" class=\"page-link\" aria-label=\"Next\"><span class=\"user-select-none\" aria-hidden=\"true\">&raquo;</span></a></li></ul></nav>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-ext=\"form-json\" hx-include=\"#browseAuctionsForm\" hx-swap=\"innerHTML\" hx-target=\"#auctionsList\" class=\"page-link\" aria-label=\"Next\"><span class=\"user-select-none\" aria-hidden=\"true\">&raquo;</span></a></li></ul></nav>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

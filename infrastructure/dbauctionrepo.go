@@ -27,12 +27,13 @@ func (r *DBAuctionRepo) GetAuctions(ctx context.Context, auctionFilter AuctionFi
 	}
 
 	dbAuctions, err := r.queries.GetAuctions(ctx, auctionSearchParams)
+
 	if err != nil {
 		logger.Error("Failed to add Auction to DB")
 		return nil, 0, &RepositoryError{Message: err.Error()}
 	}
 
-	auctions, totalMatchingAuctions, err := r.mapper.DBAuctionDetailsToAuctions(dbAuctions)
+	auctions, totalMatchingAuctions, err := r.mapper.DBGetAuctionsRowsToAuctions(dbAuctions)
 	if err != nil {
 		logger.Warn("Failed to convert addition result to domain entity. Addition succeeded.")
 		return nil, 0, &RepositoryError{Message: "Couldn't map db auctions to domain auctions"}
@@ -51,7 +52,7 @@ func (r *DBAuctionRepo) GetAllAuctionsByUser(ctx context.Context, seller model.U
 		return nil, &RepositoryError{Message: "database couldn't retrieve auctions"}
 	}
 
-	auctions, _, err := r.mapper.DBAuctionDetailsToAuctions(dbAuctions)
+	auctions, err := r.mapper.DBAuctionDetailsToAuctions(dbAuctions)
 	if err != nil {
 		logger.Error("Auctions were retrieved successfully, but couldn't be mapped to domain entity")
 		return nil, &RepositoryError{Message: "entity couldn't be mapped to DB model"}

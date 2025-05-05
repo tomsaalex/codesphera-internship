@@ -60,7 +60,7 @@ func (q *Queries) AddAuction(ctx context.Context, arg AddAuctionParams) (Auction
 }
 
 const getAllAuctionsByUser = `-- name: GetAllAuctionsByUser :many
-SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at, seller_id, seller_name, seller_email, category_id, category_name, total_rows FROM auction_details 
+SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at, seller_id, seller_name, seller_email, category_id, category_name FROM auction_details 
 WHERE seller_id = $1
 `
 
@@ -87,7 +87,6 @@ func (q *Queries) GetAllAuctionsByUser(ctx context.Context, sellerID pgtype.UUID
 			&i.SellerEmail,
 			&i.CategoryID,
 			&i.CategoryName,
-			&i.TotalRows,
 		); err != nil {
 			return nil, err
 		}
@@ -100,7 +99,7 @@ func (q *Queries) GetAllAuctionsByUser(ctx context.Context, sellerID pgtype.UUID
 }
 
 const getAuctionByName = `-- name: GetAuctionByName :one
-SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at, seller_id, seller_name, seller_email, category_id, category_name, total_rows FROM auction_details
+SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at, seller_id, seller_name, seller_email, category_id, category_name FROM auction_details
 WHERE product_name = $1 LIMIT 1
 `
 
@@ -121,13 +120,12 @@ func (q *Queries) GetAuctionByName(ctx context.Context, productName string) (Auc
 		&i.SellerEmail,
 		&i.CategoryID,
 		&i.CategoryName,
-		&i.TotalRows,
 	)
 	return i, err
 }
 
 const getAuctions = `-- name: GetAuctions :many
-SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at, seller_id, seller_name, seller_email, category_id, category_name, total_rows FROM auction_details WHERE
+SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at, seller_id, seller_name, seller_email, category_id, category_name, COUNT(*) OVER() AS TotalRows FROM auction_details WHERE
 (($1::text IS NULL OR product_name LIKE '%' || $1::text || '%') OR
 ($2::text IS NULL OR product_desc LIKE '%' || $2::text || '%')) AND
 (category_name = $3::text OR $3 IS NULL)
@@ -152,9 +150,26 @@ type GetAuctionsParams struct {
 	PageSize     int32       `json:"page_size"`
 }
 
+type GetAuctionsRow struct {
+	ID            pgtype.UUID      `json:"id"`
+	ProductName   string           `json:"product_name"`
+	ProductDesc   string           `json:"product_desc"`
+	AucMode       AuctionMode      `json:"auc_mode"`
+	AucStatus     AuctionStatus    `json:"auc_status"`
+	StartingPrice float32          `json:"starting_price"`
+	TargetPrice   pgtype.Float4    `json:"target_price"`
+	CreatedAt     pgtype.Timestamp `json:"created_at"`
+	SellerID      pgtype.UUID      `json:"seller_id"`
+	SellerName    string           `json:"seller_name"`
+	SellerEmail   string           `json:"seller_email"`
+	CategoryID    pgtype.UUID      `json:"category_id"`
+	CategoryName  string           `json:"category_name"`
+	Totalrows     int64            `json:"totalrows"`
+}
+
 // TODO: Pretty sure there's SQL injection in that LIKE....
 // limit and offset are NOT good for pagination, but let's ignore that for now
-func (q *Queries) GetAuctions(ctx context.Context, arg GetAuctionsParams) ([]AuctionDetail, error) {
+func (q *Queries) GetAuctions(ctx context.Context, arg GetAuctionsParams) ([]GetAuctionsRow, error) {
 	rows, err := q.db.Query(ctx, getAuctions,
 		arg.ProductName,
 		arg.ProductDesc,
@@ -168,9 +183,9 @@ func (q *Queries) GetAuctions(ctx context.Context, arg GetAuctionsParams) ([]Auc
 		return nil, err
 	}
 	defer rows.Close()
-	items := []AuctionDetail{}
+	items := []GetAuctionsRow{}
 	for rows.Next() {
-		var i AuctionDetail
+		var i GetAuctionsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.ProductName,
@@ -185,7 +200,7 @@ func (q *Queries) GetAuctions(ctx context.Context, arg GetAuctionsParams) ([]Auc
 			&i.SellerEmail,
 			&i.CategoryID,
 			&i.CategoryName,
-			&i.TotalRows,
+			&i.Totalrows,
 		); err != nil {
 			return nil, err
 		}

@@ -1,5 +1,5 @@
 -- name: GetAuctions :many
-SELECT * FROM auction_details WHERE
+SELECT *, COUNT(*) OVER() AS TotalRows FROM auction_details WHERE
 -- TODO: Pretty sure there's SQL injection in that LIKE....
 ((sqlc.narg(product_name)::text IS NULL OR product_name LIKE '%' || sqlc.narg(product_name)::text || '%') OR
 (sqlc.narg(product_desc)::text IS NULL OR product_desc LIKE '%' || sqlc.narg(product_desc)::text || '%')) AND

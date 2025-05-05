@@ -38,7 +38,8 @@ func NewAuctionRestController(auctionService service.AuctionService, jwtHelper u
 func (rc *AuctionRestController) SetupRoutes(r chi.Router) {
 	r.With(middleware.RequireAuth).Get("/start-auction", rc.createAuctionPage)
 	r.With(middleware.RequireAuth).Post("/auctions", rc.addAuction)
-	r.Get("/search-auctions", rc.searchAuctions)
+	r.Get("/search-auctions", rc.searchAuctionsPage)
+	r.Get("/auctions/{auctionId}", rc.auctionPage)
 	r.Post("/auction-page/{pageNum}", rc.searchAuctionsList)
 }
 
@@ -89,16 +90,17 @@ func (rc *AuctionRestController) searchAuctionsList(w http.ResponseWriter, r *ht
 	auctionSearchParams.SkippedPages = skippedPages
 
 	auctionFilter := auctionSearchParams.ToServiceStruct()
-	auctions, _, err := rc.auctionService.GetAuctions(r.Context(), *auctionFilter)
+	auctions, totalMatchingAuctions, err := rc.auctionService.GetAuctions(r.Context(), *auctionFilter)
 	if err != nil {
 		custalerts.MakeAlertDanger("Couldn't retrieve auctions. Try again later!").Render(r.Context(), w)
 		return
 	}
 
-	auclist.MakeStandardAuctionList(auctions, *pagenav.MakePageNav(4, skippedPages+1)).Render(r.Context(), w)
+	totalPageCount := (totalMatchingAuctions + auctionFilter.PageSize - 1) / auctionFilter.PageSize
+	auclist.MakeStandardAuctionList(auctions, *pagenav.MakePageNav(totalPageCount, skippedPages+1)).Render(r.Context(), w)
 }
 
-func (rc *AuctionRestController) searchAuctions(w http.ResponseWriter, r *http.Request) {
+func (rc *AuctionRestController) searchAuctionsPage(w http.ResponseWriter, r *http.Request) {
 	logger := middleware.LoggerFromContext(r.Context()).With(slog.String("Layer", "AuctionRestController"))
 	logger.Info("Rendering Auction Browsing Page")
 	productQuery := r.URL.Query().Get("productQuery")
@@ -244,4 +246,8 @@ func (rc *AuctionRestController) addAuction(w http.ResponseWriter, r *http.Reque
 	logger.Info("Auction was added successfully")
 	// TODO: Redirect to auction page... after you make it
 	w.Header().Set("HX-Redirect", "/")
+}
+
+func (rc *AuctionRestController) auctionPage(w http.ResponseWriter, r *http.Request) {
+
 }

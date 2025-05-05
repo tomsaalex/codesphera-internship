@@ -142,7 +142,6 @@ type AuctionDetail struct {
 	SellerEmail   string           `json:"seller_email"`
 	CategoryID    pgtype.UUID      `json:"category_id"`
 	CategoryName  string           `json:"category_name"`
-	TotalRows     int64            `json:"total_rows"`
 }
 
 type Category struct {

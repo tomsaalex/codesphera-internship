@@ -34,7 +34,7 @@ func component(m *Model) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if m.searchBarLocation == "browsePage" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " hx-post=\"/auction-page/1\" hx-ext=\"form-json\" hx-swap=\"innerHTML\" hx-target=\"#auctionsList\" hx-trigger=\"keyup changed delay:300ms from:#searchInput, change delay:300ms from:#categorySelect, change delay:300ms from:#orderBySelect, change delay:300ms from:#orderSelect\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " hx-post=\"/auction-page/1\" hx-ext=\"form-json\" hx-swap=\"innerHTML\" hx-target=\"#auctionsList\" hx-trigger=\"keyup changed delay:300ms from:#searchInput, change delay:300ms from:#categorySelect, change delay:300ms from:#orderBySelect, change delay:300ms from:#orderSelect, click from:#searchButton\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -83,7 +83,7 @@ func component(m *Model) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" aria-describedby=\"addon-wrapping\"> <button class=\"btn btn-outline-secondary\" type=\"submit\" id=\"search-button\">Search</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" aria-describedby=\"addon-wrapping\"> <button class=\"btn btn-outline-secondary\" type=\"submit\" id=\"searchButton\">Search</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

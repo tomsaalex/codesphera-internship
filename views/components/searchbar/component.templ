@@ -9,7 +9,7 @@ templ component(m *Model) {
         hx-ext="form-json" 
         hx-swap="innerHTML" 
         hx-target="#auctionsList" 
-        hx-trigger="keyup changed delay:300ms from:#searchInput, change delay:300ms from:#categorySelect, change delay:300ms from:#orderBySelect, change delay:300ms from:#orderSelect" 
+        hx-trigger="keyup changed delay:300ms from:#searchInput, change delay:300ms from:#categorySelect, change delay:300ms from:#orderBySelect, change delay:300ms from:#orderSelect, click from:#searchButton" 
     } else {
         action="/search-auctions" form-method="GET"
     }
@@ -18,6 +18,6 @@ templ component(m *Model) {
         class="w-75 input-group flex-nowrap" style="height:3rem">
         <span class="input-group-text"><i class="bi bi-search"></i></span>
         <input id="searchInput" type="text" class="form-control" name="productQuery" value={m.initialText} placeholder={m.placeholder} aria-label={m.label} aria-describedby="addon-wrapping">
-        <button class="btn btn-outline-secondary" type="submit" id="search-button">Search</button>
+        <button class="btn btn-outline-secondary" type="submit" id="searchButton">Search</button>
     </form>
 }

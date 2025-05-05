@@ -19,7 +19,7 @@ templ AuctionCard(model *Model) {
         <div class={"d-flex", "rounded-bottom", cardBackground()}>    
             <img class={cardImage()} src="/images/img_placeholder.jpg" width="200px" height="200px"/>
             <div class="d-flex flex-column mx-2 w-100">
-                <p class="fs-1">{model.auction.ProductName}</p>
+                <a href="#" class="fs-1">{model.auction.ProductName}</a>
                 <hr class="my-1">
                 <p class="fs-4">{model.auction.ProductDescription}</p>
                 <p>{model.auction.Category.Name}</p>

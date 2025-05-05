@@ -47,9 +47,7 @@ SELECT
     u.fullname AS seller_name,
     u.email AS seller_email,
     c.id AS category_id,
-    c.category_name AS category_name,
-    -- this will potentially ruin the performance of this query
-    COUNT(*) OVER() AS total_rows
+    c.category_name AS category_name
 FROM auctions a
 JOIN users u ON a.seller_id = u.id
 JOIN categories c ON a.category_id = c.id;

@@ -4,17 +4,17 @@ templ PaginationNav(vm *ViewModel) {
     <nav aria-label="Auction Pages Navigation">
         <ul class="pagination">
             <li class="page-item">
-                <a hx-post={vm.firstPageLink.GetLink()} hx-swap="innerHTML" hx-target="#auctionsList" class="page-link"  aria-label="First">
+                <a hx-post={vm.firstPageLink.GetLink()} hx-ext="form-json" hx-include="#browseAuctionsForm" hx-swap="innerHTML" hx-target="#auctionsList" class="page-link"  aria-label="First">
                     <span class="user-select-none" aria-hidden="true">&laquo;</span>
                 </a>   
             </li>
 
             for _, pageLink := range vm.pages {
-                <li class="page-item user-select-none"><a hx-post={pageLink.GetLink()} hx-swap="innerHTML" hx-target="#auctionsList" class={"page-link", templ.KV("active", pageLink.isSelected)}>{pageLink.pageNum}</a></li>    
+                <li class="page-item user-select-none"><a hx-post={pageLink.GetLink()} hx-ext="form-json" hx-include="#browseAuctionsForm" hx-swap="innerHTML" hx-target="#auctionsList" class={"page-link", templ.KV("active", pageLink.isSelected)}>{pageLink.pageNum}</a></li>    
             }
 
             <li class="page-item">
-                <a hx-post={vm.lastPageLink.GetLink()} hx-swap="innerHTML" hx-target="#auctionsList" class="page-link" aria-label="Next">
+                <a hx-post={vm.lastPageLink.GetLink()} hx-ext="form-json" hx-include="#browseAuctionsForm" hx-swap="innerHTML" hx-target="#auctionsList" class="page-link" aria-label="Next">
                     <span class="user-select-none" aria-hidden="true">&raquo;</span>
                 </a>
             </li>
