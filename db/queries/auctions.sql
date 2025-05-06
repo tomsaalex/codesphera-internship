@@ -26,6 +26,10 @@ RETURNING *;
 SELECT * FROM auction_details 
 WHERE seller_id = $1;
 
+-- name: GetAuctionById :one
+SELECT * FROM auction_details
+WHERE id=$1 LIMIT 1;
+
 -- name: GetAuctionByName :one
 SELECT * FROM auction_details
 WHERE product_name = $1 LIMIT 1;

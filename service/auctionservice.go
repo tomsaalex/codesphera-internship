@@ -9,6 +9,8 @@ import (
 	"log"
 	"log/slog"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type AuctionService struct {
@@ -148,6 +150,10 @@ func (s *AuctionService) AddAuction(ctx context.Context, auctionDTO AuctionDTO) 
 
 func (s *AuctionService) GetAuctions(ctx context.Context, auctionFilter infrastructure.AuctionFilter) ([]model.Auction, int, error) {
 	return s.auctionRepo.GetAuctions(ctx, auctionFilter)
+}
+
+func (s *AuctionService) GetAuctionById(ctx context.Context, auctionId uuid.UUID) (*model.Auction, error) {
+	return s.auctionRepo.GetAuctionById(ctx, auctionId)
 }
 
 func (s *AuctionService) refreshCategories() ([]model.Category, error) {

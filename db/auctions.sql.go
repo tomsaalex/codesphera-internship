@@ -98,6 +98,32 @@ func (q *Queries) GetAllAuctionsByUser(ctx context.Context, sellerID pgtype.UUID
 	return items, nil
 }
 
+const getAuctionById = `-- name: GetAuctionById :one
+SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at, seller_id, seller_name, seller_email, category_id, category_name FROM auction_details
+WHERE id=$1 LIMIT 1
+`
+
+func (q *Queries) GetAuctionById(ctx context.Context, id pgtype.UUID) (AuctionDetail, error) {
+	row := q.db.QueryRow(ctx, getAuctionById, id)
+	var i AuctionDetail
+	err := row.Scan(
+		&i.ID,
+		&i.ProductName,
+		&i.ProductDesc,
+		&i.AucMode,
+		&i.AucStatus,
+		&i.StartingPrice,
+		&i.TargetPrice,
+		&i.CreatedAt,
+		&i.SellerID,
+		&i.SellerName,
+		&i.SellerEmail,
+		&i.CategoryID,
+		&i.CategoryName,
+	)
+	return i, err
+}
+
 const getAuctionByName = `-- name: GetAuctionByName :one
 SELECT id, product_name, product_desc, auc_mode, auc_status, starting_price, target_price, created_at, seller_id, seller_name, seller_email, category_id, category_name FROM auction_details
 WHERE product_name = $1 LIMIT 1

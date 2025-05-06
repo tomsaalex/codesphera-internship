@@ -144,6 +144,13 @@ type AuctionDetail struct {
 	CategoryName  string           `json:"category_name"`
 }
 
+type Bid struct {
+	ID        pgtype.UUID `json:"id"`
+	BidValue  float32     `json:"bid_value"`
+	AuctionID pgtype.UUID `json:"auction_id"`
+	BidderID  pgtype.UUID `json:"bidder_id"`
+}
+
 type Category struct {
 	ID           pgtype.UUID `json:"id"`
 	CategoryName string      `json:"category_name"`

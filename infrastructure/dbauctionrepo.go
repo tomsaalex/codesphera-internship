@@ -9,6 +9,7 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
@@ -73,7 +74,29 @@ func (r *DBAuctionRepo) GetAuctionByName(ctx context.Context, productName string
 
 	if err != nil {
 		logger.Error("Auction was retrieved successfully, but couldn't be mapped to the domain entity")
-		return nil, &RepositoryError{Message: "entity couldn't be mapped to domain model"}
+		return nil, &RepositoryError{Message: "Auction couldn't be mapped to domain model"}
+	}
+
+	return auction, nil
+}
+
+func (r *DBAuctionRepo) GetAuctionById(ctx context.Context, auctionId uuid.UUID) (*model.Auction, error) {
+	logger := middleware.LoggerFromContext(ctx).With(slog.String("Layer", "DBAuctionRepo"), slog.String("Auction ID", auctionId.String()))
+
+	dbUuid := r.mapper.uuidToDBUuid(auctionId)
+
+	dbAuction, err := r.queries.GetAuctionById(ctx, dbUuid)
+
+	if err != nil {
+		logger.Error("No Auction was found with the given Id.")
+		return nil, &RepositoryError{Message: "no Auction found with the given Id"}
+	}
+
+	auction, err := r.mapper.DBAuctionDetailToAuction(dbAuction)
+
+	if err != nil {
+		logger.Error("Auction couldn't be mapped to domain model.")
+		return nil, &RepositoryError{Message: "Auction couldn't be mapped to domain model"}
 	}
 
 	return auction, nil

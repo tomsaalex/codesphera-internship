@@ -33,6 +33,14 @@ CREATE TABLE auctions (
     seller_id UUID not null references users(id)
 );
 
+CREATE TABLE bids(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    bid_value real not null,
+
+    auction_id UUID not null references auctions(id),
+    bidder_id UUID not null references users(id)
+);
+
 CREATE VIEW auction_details AS
 SELECT
     a.id,

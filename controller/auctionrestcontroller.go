@@ -14,13 +14,16 @@ import (
 	"curs1_boilerplate/views/components/searchbar"
 	"curs1_boilerplate/views/pages/aucbrowse"
 	"curs1_boilerplate/views/pages/auccreate"
+	"curs1_boilerplate/views/pages/aucdetail"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 )
 
 type AuctionRestController struct {
@@ -159,7 +162,7 @@ func (rc *AuctionRestController) addAuction(w http.ResponseWriter, r *http.Reque
 	// TODO: I despise using raw strings like this with my entire being, but it'll have to do for now
 	formHasTargetPrice := auctionDTO.Mode == "Price Met"
 
-	_, err = rc.auctionService.AddAuction(r.Context(), auctionDTO)
+	addedAuction, err := rc.auctionService.AddAuction(r.Context(), auctionDTO)
 
 	if err != nil {
 		var entityNotFoundErr *infrastructure.EntityNotFoundError
@@ -244,10 +247,34 @@ func (rc *AuctionRestController) addAuction(w http.ResponseWriter, r *http.Reque
 	}
 
 	logger.Info("Auction was added successfully")
-	// TODO: Redirect to auction page... after you make it
-	w.Header().Set("HX-Redirect", "/")
+
+	auctionPageURL := fmt.Sprintf("/auctions/%s", addedAuction.Id.String())
+	w.Header().Set("HX-Redirect", auctionPageURL)
 }
 
 func (rc *AuctionRestController) auctionPage(w http.ResponseWriter, r *http.Request) {
+	logger := middleware.LoggerFromContext(r.Context()).With(slog.String("Layer", "AuctionRestController"))
 
+	auctionIdString := chi.URLParam(r, "auctionId")
+
+	navbar := navbar.MakeStandardNavbar(r.Context())
+
+	// TODO: The parse method accepts non-standard UUID formats. Decide later if that's a problem or not
+	auctionId, err := uuid.Parse(auctionIdString)
+
+	if err != nil {
+		logger.Error("Failed to parse auctionId into a valid UUID")
+		// TODO: Render auction page with error message
+	}
+
+	foundAuction, err := rc.auctionService.GetAuctionById(r.Context(), auctionId)
+
+	if err != nil {
+		// TODO: Render page with error message
+	}
+
+	auctionPage := aucdetail.MakeAuctionDetailPage(r.Context(), foundAuction, navbar)
+
+	logger.Info("Auction Page has been rendered successfully")
+	base.PageSkeleton(auctionPage).Render(r.Context(), w)
 }
